@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mobile-first responsive styles */
+html {
+  font-size: 16px;
+}
+
+body {
+  @apply text-gray-900 bg-gray-50;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better tap targets on mobile */
+button, a {
+  @apply min-h-[44px] min-w-[44px];
+}
+
+/* Improve form element accessibility on mobile */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+textarea,
+select {
+  @apply text-base;
+  min-height: 44px;
+}
+
+/* Prevent overflow on smaller screens */
+.break-words {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Improved mobile scrolling */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar for better UX */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+}
+
+/* Mobile viewport height fix for iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  .h-screen {
+    height: -webkit-fill-available;
+  }
+}
