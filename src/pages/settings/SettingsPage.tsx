@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { getAuth, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 
 const SettingsPage: React.FC = () => {
   const { userProfile, currentUser, refreshUserProfile } = useAuth();
@@ -61,7 +62,7 @@ const SettingsPage: React.FC = () => {
   };
   
   // Change password handler
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (!currentPassword) {
       toast.error('Current password is required');
       return;
@@ -82,17 +83,56 @@ const SettingsPage: React.FC = () => {
       return;
     }
     
+    if (!currentUser) {
+      toast.error('You must be logged in to change your password');
+      return;
+    }
+    
     setSavingPassword(true);
     
-    // Simulate API call to change password
-    setTimeout(() => {
-      // In a real app, this would update the user's password in Firebase Auth
-      setSavingPassword(false);
+    try {
+      // Get the current Firebase Auth instance
+      const auth = getAuth();
+      const user = auth.currentUser;
+      
+      if (!user || !user.email) {
+        throw new Error('No authenticated user found');
+      }
+      
+      // Create credential with current email and password
+      const credential = EmailAuthProvider.credential(
+        user.email,
+        currentPassword
+      );
+      
+      // Re-authenticate user to verify current password
+      await reauthenticateWithCredential(user, credential);
+      
+      // Update password
+      await updatePassword(user, newPassword);
+      
+      // Clear form fields
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      
       toast.success('Password updated successfully');
-    }, 1000);
+    } catch (error: any) {
+      console.error('Failed to update password:', error);
+      
+      // Handle specific error cases
+      if (error.code === 'auth/wrong-password') {
+        toast.error('Current password is incorrect');
+      } else if (error.code === 'auth/weak-password') {
+        toast.error('Password is too weak. Choose a stronger password');
+      } else if (error.code === 'auth/requires-recent-login') {
+        toast.error('This operation requires a recent login. Please log out and log in again before retrying');
+      } else {
+        toast.error('Failed to update password: ' + (error.message || 'Unknown error'));
+      }
+    } finally {
+      setSavingPassword(false);
+    }
   };
   
   // Delete account handler
