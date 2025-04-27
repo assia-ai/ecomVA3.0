@@ -359,19 +359,50 @@ export async function generateDraftContent(
     
     // Process the response
     if (response && response.data) {
-      console.log(`generateDraftContent: Raw draft response:`, response.data);
+      console.log(`generateDraftContent: Raw draft response:`, {
+        ...response.data,
+        shopifyAccessToken: response.data.shopifyAccessToken ? '[REDACTED]' : undefined
+      });
       
-      const draftContent = response.data.message || response.data.draft || response.data.output;
+      // Get the draft content
+      let draftContent = response.data.draftReply || 
+                        response.data.message || 
+                        response.data.draft || 
+                        response.data.output;
       
       if (draftContent && typeof draftContent === 'string' && draftContent.trim() !== '') {
-        console.log(`generateDraftContent: Successfully received draft content`);
+        console.log(`generateDraftContent: Successfully received draft reply content`);
+        
+        // Format the content properly as an email response
+        // Make sure it's properly formatted as HTML
+        if (!draftContent.includes('<p>') && !draftContent.includes('<div>')) {
+          // If it's not HTML formatted, convert it
+          draftContent = draftContent.split('\n').map(line => `<p>${line}</p>`).join('');
+        }
+        
+        // Ensure there's a proper greeting if not present
+        const firstName = sender.split(' ')[0].replace(/<.*$/, '').trim();
+        if (!draftContent.toLowerCase().includes('bonjour') && !draftContent.toLowerCase().includes('hello')) {
+          draftContent = `<p>Bonjour ${firstName},</p>\n${draftContent}`;
+        }
+        
+        // Ensure there's a proper signature if not present
+        if (!draftContent.toLowerCase().includes('cordialement') && 
+            !draftContent.toLowerCase().includes('bien à vous') && 
+            !draftContent.toLowerCase().includes('sincèrement')) {
+          const signatureText = signature || 'Cordialement,';
+          if (!draftContent.includes(signatureText)) {
+            draftContent += `\n<p>${signatureText}</p>`;
+          }
+        }
+        
         return draftContent;
       }
     }
     
-    console.warn('Draft webhook returned invalid or empty content');
+    // Return default if we couldn't get good content
     return defaultResponse;
-  } catch (error: any) {
+  } catch (error) {
     // Handle errors
     if (error.response) {
       console.error('Draft API error:', error.response.status, error.response.data);

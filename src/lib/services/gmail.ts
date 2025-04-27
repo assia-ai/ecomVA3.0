@@ -1288,11 +1288,25 @@ export class GmailService {
     const draftKey = `${to}|${subject}`;
     if (Array.from(createdDrafts.values()).includes(draftKey)) {
       console.log(`createDraft: Similar draft with subject "${subject}" and recipient "${to}" already exists, skipping`);
-      return draftKey; // Return the existing key as the draft ID
+      return draftKey;
+    }
+    
+    // Make sure content is proper HTML
+    if (!content.includes('<html>')) {
+      content = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+        </head>
+        <body>
+          ${content}
+        </body>
+        </html>
+      `;
     }
     
     // For proper threading, we need to include proper email headers
-    // Gmail requires In-Reply-To and References headers for proper threading
     const headers = [
       'Content-Type: text/html; charset=utf-8',
       'MIME-Version: 1.0',
@@ -1302,10 +1316,32 @@ export class GmailService {
     
     // If this is a reply (has threadId), add reply specific headers
     if (threadId) {
-      // The message-id format used by Gmail is typically <threadId@mail.gmail.com>
-      const messageIdReference = `<${threadId}@mail.gmail.com>`;
-      headers.push(`In-Reply-To: ${messageIdReference}`);
-      headers.push(`References: ${messageIdReference}`);
+      // Get message IDs from the thread to properly reference them
+      try {
+        const threadInfo = await this.getThread(threadId);
+        if (threadInfo && threadInfo.messages && threadInfo.messages.length > 0) {
+          // Get reference IDs from thread messages
+          const messageIds = threadInfo.messages
+            .filter(msg => msg.payload && msg.payload.headers)
+            .flatMap(msg => {
+              const headers = msg.payload.headers || [];
+              const messageIdHeader = headers.find(h => h.name.toLowerCase() === 'message-id');
+              return messageIdHeader ? [messageIdHeader.value] : [];
+            });
+          
+          if (messageIds.length > 0) {
+            // Use the original message IDs for references
+            headers.push(`In-Reply-To: ${messageIds[0]}`);
+            headers.push(`References: ${messageIds.join(' ')}`);
+          }
+        }
+      } catch (error) {
+        console.warn("Couldn't get message IDs from thread:", error);
+        // Fallback to simple threading approach
+        const messageIdReference = `<${threadId}@mail.gmail.com>`;
+        headers.push(`In-Reply-To: ${messageIdReference}`);
+        headers.push(`References: ${messageIdReference}`);
+      }
     }
     
     // Combine headers and content
@@ -1349,6 +1385,13 @@ export class GmailService {
       console.error(`createDraft: Failed to create draft:`, error);
       throw error;
     }
+  }
+
+  async getThread(threadId: string) {
+    return this.request<any>(`/threads/${threadId}`, {
+      method: 'GET',
+      params: { format: 'full' }
+    });
   }
 
   static initiateOAuth() {
