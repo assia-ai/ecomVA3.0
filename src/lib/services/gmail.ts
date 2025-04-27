@@ -54,14 +54,14 @@ const GMAIL_VALID_COLORS = [
 
 // Category to label mapping with valid Gmail color palette values
 const CATEGORY_LABELS = {
-  '📦 Livraison / Suivi de commande': { name: 'ecommva/delivery', backgroundColor: "#4a86e8", textColor: "#ffffff" },
-  '❌ Annulation': { name: 'ecommva/cancellation', backgroundColor: "#fb4c2f", textColor: "#ffffff" },
-  '💸 Remboursement': { name: 'ecommva/refund', backgroundColor: "#16a766", textColor: "#ffffff" },
-  '🔁 Retour': { name: 'ecommva/return', backgroundColor: "#ffad47", textColor: "#000000" },
-  '🛍 Avant-vente': { name: 'ecommva/presale', backgroundColor: "#a479e2", textColor: "#ffffff" },
-  '🔒 Résolu': { name: 'ecommva/resolved', backgroundColor: "#43d692", textColor: "#000000" },
-  '🚫 Spam / à ignorer': { name: 'ecommva/filtered', backgroundColor: "#666666", textColor: "#ffffff" },
-  '🧾 Autres': { name: 'ecommva/other', backgroundColor: "#a4c2f4", textColor: "#000000" }
+  '📦 Livraison / Suivi de commande': { name: '📦 Livraison / Suivi de commande', backgroundColor: "#4a86e8", textColor: "#ffffff" },
+  '❌ Annulation': { name: '❌ Annulation', backgroundColor: "#fb4c2f", textColor: "#ffffff" },
+  '💸 Remboursement': { name: '💸 Remboursement', backgroundColor: "#16a766", textColor: "#ffffff" },
+  '🔁 Retour': { name: '🔁 Retour', backgroundColor: "#ffad47", textColor: "#000000" },
+  '🛍 Avant-vente': { name: '🛍 Avant-vente', backgroundColor: "#a479e2", textColor: "#ffffff" },
+  '🔒 Résolu': { name: '🔒 Résolu', backgroundColor: "#43d692", textColor: "#000000" },
+  '🚫 Spam / à ignorer': { name: '🚫 Spam / à ignorer', backgroundColor: "#666666", textColor: "#ffffff" },
+  '🧾 Autres': { name: '🧾 Autres', backgroundColor: "#a4c2f4", textColor: "#000000" }
 };
 
 // Default fallback category
@@ -922,7 +922,8 @@ export class GmailService {
               'classified',
               undefined,
               message.snippet || '',
-              message.id
+              message.id,
+              message.threadId  // Pass the threadId here
             );
             
             continue;
@@ -959,7 +960,8 @@ export class GmailService {
             'classified',
             undefined,
             message.snippet || '',
-            message.id
+            message.id,
+            message.threadId  // Pass the threadId here
           );
 
           // Check if we should create a draft response
@@ -985,22 +987,28 @@ export class GmailService {
                 message.snippet || '', 
                 category, 
                 from,
-                signature  // Pass signature to the webhook
+                signature,
+                userPreferences?.fromEmail,
+                userPreferences?.shopDomain,
+                userPreferences?.shopifyAccessToken
               );
               
               // Create the draft
-              console.log(`processRecentEmails: Creating draft reply to ${from}`);
+              console.log(`processRecentEmails: Creating draft reply to ${from} for thread ${message.threadId}`);
               const draftId = await this.createDraft(
                 from,
                 `Re: ${subject}`,
-                responseContent
+                responseContent,
+                message.threadId  // Pass the threadId to ensure proper threading
               );
               
               // Store the draft ID to prevent duplicate draft creation
               createdDrafts.set(message.id, draftId);
               
-              // Get the draft URL
-              const draftUrl = `https://mail.google.com/mail/u/0/#drafts/${draftId}`;
+              // Get the draft URL - FORMAT IS CRUCIAL HERE
+              // Gmail draft URL format: https://mail.google.com/mail/u/0/#drafts?compose=draftId
+              // Using the correct format ensures direct opening of the specific draft
+              const draftUrl = `https://mail.google.com/mail/u/0/#drafts?compose=${draftId}`;
               console.log(`processRecentEmails: Created draft with URL ${draftUrl}`);
               
               // Update the activity with the draft URL
@@ -1012,7 +1020,8 @@ export class GmailService {
                 'draft_created',
                 draftUrl,
                 message.snippet || '',
-                message.id
+                message.id,
+                message.threadId  // Pass the threadId here
               );
               
               console.log(`processRecentEmails: Updated activity for message ${message.id} with draft URL`);
@@ -1272,8 +1281,8 @@ export class GmailService {
     }
   }
 
-  async createDraft(to: string, subject: string, content: string): Promise<string> {
-    console.log(`createDraft: Creating draft reply to "${to}" with subject "${subject}"`);
+  async createDraft(to: string, subject: string, content: string, threadId?: string): Promise<string> {
+    console.log(`createDraft: Creating draft reply to "${to}" with subject "${subject}"${threadId ? ' in thread: ' + threadId : ''}`);
     
     // Check if we've already created a similar draft
     const draftKey = `${to}|${subject}`;
@@ -1282,12 +1291,27 @@ export class GmailService {
       return draftKey; // Return the existing key as the draft ID
     }
     
-    const email = [
+    // For proper threading, we need to include proper email headers
+    // Gmail requires In-Reply-To and References headers for proper threading
+    const headers = [
       'Content-Type: text/html; charset=utf-8',
       'MIME-Version: 1.0',
       `To: ${to}`,
-      `Subject: ${subject}`,
-      '',
+      `Subject: ${subject}`
+    ];
+    
+    // If this is a reply (has threadId), add reply specific headers
+    if (threadId) {
+      // The message-id format used by Gmail is typically <threadId@mail.gmail.com>
+      const messageIdReference = `<${threadId}@mail.gmail.com>`;
+      headers.push(`In-Reply-To: ${messageIdReference}`);
+      headers.push(`References: ${messageIdReference}`);
+    }
+    
+    // Combine headers and content
+    const email = [
+      ...headers,
+      '',  // Empty line separates headers from body
       content
     ].join('\r\n');
 
@@ -1296,14 +1320,23 @@ export class GmailService {
     const encodedEmail = btoa(unescape(encodeURIComponent(email))).replace(/\+/g, '-').replace(/\//g, '_');
 
     try {
-      console.log(`createDraft: Sending draft creation request`);
+      console.log(`createDraft: Sending draft creation request${threadId ? ' with threadId: ' + threadId : ''}`);
+      
+      // Create the request body
+      const requestBody: any = {
+        message: {
+          raw: encodedEmail
+        }
+      };
+      
+      // Add threadId if it exists to ensure proper conversation threading
+      if (threadId) {
+        requestBody.message.threadId = threadId;
+      }
+      
       const response = await this.request<{ id: string }>('/drafts', {
         method: 'POST',
-        body: JSON.stringify({
-          message: {
-            raw: encodedEmail
-          }
-        })
+        body: JSON.stringify(requestBody)
       });
 
       console.log(`createDraft: Draft created successfully with ID ${response.id}`);

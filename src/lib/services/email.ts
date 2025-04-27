@@ -2,6 +2,67 @@ import axios from 'axios';
 import { addDoc, getDocs, query, where, collection, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { emailsCollection, type EmailActivity } from '../collections';
 import { db } from '../firebase';
+import { getAuth } from 'firebase/auth';
+
+/**
+ * Retrieves the current user's Shopify shop domain and access token from Firestore
+ * @returns {Promise<{shopDomain: string, accessToken: string}>} Object containing the shop domain and access token
+ */
+export async function getUserShopifyInfo() {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+  
+  if (!currentUser) {
+    console.warn('No authenticated user found when trying to get Shopify info');
+    return { shopDomain: '', accessToken: '' };
+  }
+  
+  try {
+    console.log(`getUserShopifyInfo: Getting Shopify info for user ${currentUser.uid}`);
+    
+    // Query the integrations collection for Shopify credentials
+    const integrationsQuery = query(
+      collection(db, 'integrations'),
+      where('userId', '==', currentUser.uid),
+      where('type', '==', 'shopify')
+    );
+    
+    const querySnapshot = await getDocs(integrationsQuery);
+    
+    if (querySnapshot.empty) {
+      console.warn('No Shopify integration found for this user');
+      return { shopDomain: '', accessToken: '' };
+    }
+    
+    // Get the first matching integration document
+    const integrationData = querySnapshot.docs[0].data();
+    console.log('getUserShopifyInfo: Integration data retrieved');
+    
+    // Log available fields for debugging
+    console.log('getUserShopifyInfo: Available integration fields:', Object.keys(integrationData));
+    
+    // Extract shop domain and access token based on the actual field names in your database
+    const shopDomain = integrationData.config?.shopDomain || 
+                       integrationData.shopDomain || 
+                       '';
+                       
+    const accessToken = integrationData.config?.accessToken || 
+                        integrationData.accessToken || 
+                        '';
+    
+    // Log the values we found (redact sensitive data)
+    console.log(`getUserShopifyInfo: Found shopDomain: ${shopDomain ? shopDomain : 'Not found'}`);
+    console.log(`getUserShopifyInfo: Found accessToken: ${accessToken ? '***REDACTED***' : 'Not found'}`);
+    
+    return {
+      shopDomain,
+      accessToken
+    };
+  } catch (error) {
+    console.error('Error retrieving Shopify info:', error);
+    return { shopDomain: '', accessToken: '' };
+  }
+}
 
 // Sample data generator for testing
 export async function createSampleEmailActivity(userId: string) {
@@ -208,7 +269,16 @@ export async function classifyEmail(subject: string, body: string): Promise<stri
 }
 
 // Generate draft content from the webhook
-export async function generateDraftContent(subject: string, body: string, category: string, sender: string, signature?: string): Promise<string> {
+export async function generateDraftContent(
+  subject: string, 
+  body: string, 
+  category: string, 
+  sender: string,
+  signature?: string,
+  emailAddress?: string,
+  shopDomain?: string,         
+  shopifyAccessToken?: string  
+): Promise<string> {
   console.log(`generateDraftContent: Generating draft for category "${category}"`);
   
   // Default response in case of error
@@ -225,26 +295,72 @@ export async function generateDraftContent(subject: string, body: string, catego
       return defaultResponse;
     }
     
+    // Use the passed email address or extract from sender
+    if (!emailAddress && sender) {
+      const matches = sender.match(/<([^>]+)>/) || sender.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
+      if (matches && matches[1]) {
+        emailAddress = "kimtomecek@gmail.com";//matches[1];
+        console.log(`generateDraftContent: Extracted email address from sender: ${emailAddress}`);
+      }
+    }
+    
+    // If Shopify credentials weren't provided, try to retrieve them from the database
+    if (!shopDomain || !shopifyAccessToken) {
+      try {
+        console.log('generateDraftContent: Attempting to retrieve Shopify info from database');
+        const shopifyInfo = await getUserShopifyInfo();
+        
+        if (shopifyInfo) {
+          // Only update if we actually got something back
+          if (shopifyInfo.shopDomain && shopifyInfo.shopDomain.trim() !== '') {
+            shopDomain = shopifyInfo.shopDomain;
+            console.log(`generateDraftContent: Retrieved shopDomain: ${shopDomain}`);
+          } else {
+            console.warn('generateDraftContent: No shopDomain found in database');
+          }
+          
+          if (shopifyInfo.accessToken && shopifyInfo.accessToken.trim() !== '') {
+            shopifyAccessToken = shopifyInfo.accessToken;
+            console.log(`generateDraftContent: Retrieved accessToken: [REDACTED]`);
+          } else {
+            console.warn('generateDraftContent: No accessToken found in database');
+          }
+        } else {
+          console.warn('generateDraftContent: getUserShopifyInfo returned null or undefined');
+        }
+      } catch (shopifyError) {
+        console.error('Could not retrieve Shopify credentials:', shopifyError);
+      }
+    }
+    
     console.log(`generateDraftContent: Sending request to draft webhook`);
     console.log(`generateDraftContent: Including signature: ${signature ? 'Yes' : 'No'}`);
+    console.log(`generateDraftContent: Including Shopify data: ${shopDomain ? 'Yes' : 'No'}`);
+    console.log(`generateDraftContent: Including email address: ${emailAddress ? 'Yes' : 'No'}`);
     
-    // Log the actual payload we're sending to the webhook for debugging
+    // Prepare the payload with all parameters
     const payload = {
       subject: subject || '',
       body: body || '',
       category: category || '🧾 Autres',
-      signature: signature || '' // Pass the signature to the webhook
+      sender: sender || '',
+      signature: signature || '',
+      emailAddress: emailAddress || '',
+      shopDomain: shopDomain || '',
+      shopifyAccessToken: shopifyAccessToken || ''
     };
     
-    console.log('generateDraftContent: Webhook payload:', JSON.stringify(payload, null, 2));
+    console.log('generateDraftContent: Webhook payload:', JSON.stringify({
+      ...payload,
+      shopifyAccessToken: payload.shopifyAccessToken ? '***REDACTED***' : '' // Hide token in logs
+    }, null, 2));
     
     const response = await axios.post<DraftResponse>(DRAFT_WEBHOOK_URL, payload);
     
-    // Check if we have a response with data
+    // Process the response
     if (response && response.data) {
       console.log(`generateDraftContent: Raw draft response:`, response.data);
       
-      // Try to get the draft content from different possible response formats
       const draftContent = response.data.message || response.data.draft || response.data.output;
       
       if (draftContent && typeof draftContent === 'string' && draftContent.trim() !== '') {
@@ -256,7 +372,7 @@ export async function generateDraftContent(subject: string, body: string, catego
     console.warn('Draft webhook returned invalid or empty content');
     return defaultResponse;
   } catch (error: any) {
-    // Log the specific error
+    // Handle errors
     if (error.response) {
       console.error('Draft API error:', error.response.status, error.response.data);
     } else if (error.request) {
@@ -309,7 +425,8 @@ export async function saveEmailActivity(
   status: EmailActivity['status'],
   draftUrl?: string,
   body?: string,
-  messageId?: string
+  messageId?: string,
+  threadId?: string  // Add threadId parameter
 ): Promise<string | null> {
   try {
     console.log(`saveEmailActivity: Saving email activity with status "${status}" and category "${category}"`);
@@ -453,6 +570,7 @@ export async function saveEmailActivity(
       draftUrl: draftUrl || null,
       body: body || null,
       messageId: messageId || null,
+      threadId: threadId || null,  // Add threadId to the document
       draftCreatedAt: status === 'draft_created' ? new Date() : null
     };
     
