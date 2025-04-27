@@ -299,7 +299,7 @@ export async function generateDraftContent(
     if (!emailAddress && sender) {
       const matches = sender.match(/<([^>]+)>/) || sender.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
       if (matches && matches[1]) {
-        emailAddress = "kimtomecek@gmail.com";//matches[1];
+        emailAddress = matches[1];
         console.log(`generateDraftContent: Extracted email address from sender: ${emailAddress}`);
       }
     }
