@@ -46,7 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       <div className="h-16 flex items-center px-6 border-b border-gray-200">
         <div className="flex items-center space-x-2">
           <Mail className="h-6 w-6 text-accent-500" />
-          <span className="text-xl font-semibold text-gray-900">ecommva</span>
+          <span className="text-xl font-semibold text-gray-900">EcomVA</span>
         </div>
       </div>
 
