@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Integrations', href: '/integrations', icon: Plug },
     { name: 'Preferences', href: '/preferences', icon: SettingsIcon },
-    { name: 'Billing', href: '/billing', icon: CreditCard },
+    // { name: 'Billing', href: '/billing', icon: CreditCard },
     { name: 'Activity Log', href: '/activity', icon: ClipboardList },
     { name: 'Settings', href: '/settings', icon: Lock }
   ];
@@ -109,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       {/* Footer */}
       <div className="px-4 py-3 border-t border-gray-200">
         <div className="text-xs text-gray-500">
-          <p>© 2025 ecommva</p>
+          <p>© 2025 EcomVA</p>
           <p>v0.1.0</p>
         </div>
       </div>
