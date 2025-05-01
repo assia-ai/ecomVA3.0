@@ -135,11 +135,11 @@ const DashboardPage: React.FC = () => {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {!isPro && (
+            {/* {!isPro && (
               <Button onClick={() => navigate('/billing')}>
                 Upgrade to Pro
               </Button>
-            )}
+            )} */}
             <Button 
               variant="outline"
               onClick={() => navigate('/activity')}
