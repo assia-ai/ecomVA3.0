@@ -21,12 +21,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { userProfile } = useAuth();
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Integrations', href: '/integrations', icon: Plug },
-    { name: 'Preferences', href: '/preferences', icon: SettingsIcon },
-    // { name: 'Billing', href: '/billing', icon: CreditCard },
-    { name: 'Activity Log', href: '/activity', icon: ClipboardList },
-    { name: 'Settings', href: '/settings', icon: Lock }
+    { name: 'Dashboard', href: '/app/dashboard', icon: Home },
+    { name: 'Integrations', href: '/app/integrations', icon: Plug },
+    { name: 'Preferences', href: '/app/preferences', icon: SettingsIcon },
+    // { name: 'Billing', href: '/app/billing', icon: CreditCard },
+    { name: 'Activity Log', href: '/app/activity', icon: ClipboardList },
+    { name: 'Settings', href: '/app/settings', icon: Lock }
   ];
 
   return (

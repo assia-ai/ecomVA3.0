@@ -25,7 +25,7 @@ const RegisterPage: React.FC = () => {
     try {
       setLoading(true);
       await register(email, password, name);
-      navigate('/dashboard');
+      navigate('/app/dashboard');
       toast.success('Account created successfully');
     } catch (error: any) {
       console.error('Registration error:', error);

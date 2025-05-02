@@ -17,6 +17,7 @@ import { useEmailProcessing } from './lib/hooks/useEmailProcessing';
 import { useAuth } from './contexts/AuthContext';
 import BackgroundProcessor from './components/BackgroundProcessor';
 import { storeUserSession, updateLastActive } from './lib/services/auth-persistence';
+import LandingPage from './pages/landing/LandingPage'; // Import landing page
 
 // EmailProcessor component to handle background email processing
 const EmailProcessor: React.FC = () => {
@@ -88,12 +89,15 @@ function App() {
         <BackgroundProcessor />
         
         <Routes>
+          {/* Add landing page as the root route */}
+          <Route path="/" element={<LandingPage />} />
+          
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           
-          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+            <Route index element={<Navigate to="/app/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="integrations" element={<IntegrationsPage />} />
             <Route path="preferences" element={<PreferencesPage />} />

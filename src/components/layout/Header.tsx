@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/login');
+      navigate('/');
       toast.success('Logged out successfully');
     } catch (error) {
       console.error('Failed to log out', error);
@@ -25,12 +25,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
   const getPageTitle = () => {
     const path = window.location.pathname;
-    if (path.includes('/dashboard')) return 'Dashboard';
-    if (path.includes('/integrations')) return 'Integrations';
-    if (path.includes('/preferences')) return 'Preferences';
-    if (path.includes('/billing')) return 'Billing';
-    if (path.includes('/activity')) return 'Activity Log';
-    if (path.includes('/settings')) return 'Settings';
+    if (path.includes('/app/dashboard')) return 'Dashboard';
+    if (path.includes('/app/integrations')) return 'Integrations';
+    if (path.includes('/app/preferences')) return 'Preferences';
+    if (path.includes('/app/billing')) return 'Billing';
+    if (path.includes('/app/activity')) return 'Activity Log';
+    if (path.includes('/app/settings')) return 'Settings';
     return '';
   };
 
