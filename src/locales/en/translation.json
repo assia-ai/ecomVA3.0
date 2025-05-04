@@ -329,18 +329,14 @@
         "description": "Update your personal information",
         "name": "Full Name",
         "email": "Email Address",
+        "emailHint": "You cannot change your email address as it is used as your login identifier.",
         "updateProfile": "Update Profile",
         "profileUpdated": "Profile updated"
       },
-      "password": {
-        "title": "Password",
-        "description": "Update your password",
-        "current": "Current Password",
-        "new": "New Password",
-        "confirm": "Confirm Password",
-        "updatePassword": "Update Password",
-        "passwordUpdated": "Password updated",
-        "passwordMismatch": "Passwords do not match"
+      "security": {
+        "sessionManagement": "Session Management",
+        "sessionDesc": "Manage devices and browsers connected to your account",
+        "viewSessions": "View Active Sessions"
       },
       "account": {
         "title": "Account",
@@ -352,7 +348,21 @@
         "billing": "Billing",
         "manageBilling": "Manage Billing",
         "deleteAccount": "Delete Account",
-        "deleteWarning": "This action is irreversible. All of your data will be permanently deleted."
+        "deleteWarning": "This action is irreversible. All of your data will be permanently deleted.",
+        "deleteDescription": "If you wish to permanently delete your account and all your data, please click the button below.",
+        "deleteExplanation": "Once you confirm deleting your account, all your personal data, processed emails, integrations, and settings will be permanently removed from our servers.",
+        "typeEmail": "Please enter your email address to confirm account deletion"
+      },
+      "password": {
+        "title": "Password",
+        "description": "Update your password",
+        "current": "Current Password",
+        "new": "New Password",
+        "confirm": "Confirm Password",
+        "updatePassword": "Update Password",
+        "passwordUpdated": "Password updated",
+        "passwordMismatch": "Passwords do not match",
+        "passwordHint": "Password must be at least 8 characters and include at least one uppercase letter, one number, and one special character."
       },
       "twoFactor": {
         "title": "Two-Factor Authentication",

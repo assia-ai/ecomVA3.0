@@ -309,18 +309,14 @@
         "description": "Mettez à jour vos informations personnelles",
         "name": "Nom complet",
         "email": "Adresse email",
+        "emailHint": "Vous ne pouvez pas modifier votre adresse email car elle est utilisée comme identifiant de connexion.",
         "updateProfile": "Mettre à jour le profil",
         "profileUpdated": "Profil mis à jour"
       },
-      "password": {
-        "title": "Mot de passe",
-        "description": "Mettez à jour votre mot de passe",
-        "current": "Mot de passe actuel",
-        "new": "Nouveau mot de passe",
-        "confirm": "Confirmer le mot de passe",
-        "updatePassword": "Mettre à jour le mot de passe",
-        "passwordUpdated": "Mot de passe mis à jour",
-        "passwordMismatch": "Les mots de passe ne correspondent pas"
+      "security": {
+        "sessionManagement": "Gestion des sessions",
+        "sessionDesc": "Gérez les appareils et navigateurs connectés à votre compte",
+        "viewSessions": "Voir les sessions actives"
       },
       "account": {
         "title": "Compte",
@@ -332,7 +328,21 @@
         "billing": "Facturation",
         "manageBilling": "Gérer la facturation",
         "deleteAccount": "Supprimer le compte",
-        "deleteWarning": "Cette action est irréversible. Toutes vos données seront définitivement effacées."
+        "deleteWarning": "Cette action est irréversible. Toutes vos données seront définitivement effacées.",
+        "deleteDescription": "Si vous souhaitez supprimer définitivement votre compte et toutes vos données, veuillez cliquer sur le bouton ci-dessous.",
+        "deleteExplanation": "Une fois que vous aurez confirmé la suppression de votre compte, toutes vos données personnelles, emails traités, intégrations et paramètres seront définitivement supprimés de nos serveurs.",
+        "typeEmail": "Veuillez saisir votre adresse email pour confirmer la suppression du compte"
+      },
+      "password": {
+        "title": "Mot de passe",
+        "description": "Mettez à jour votre mot de passe",
+        "current": "Mot de passe actuel",
+        "new": "Nouveau mot de passe",
+        "confirm": "Confirmer le mot de passe",
+        "updatePassword": "Mettre à jour le mot de passe",
+        "passwordUpdated": "Mot de passe mis à jour",
+        "passwordMismatch": "Les mots de passe ne correspondent pas",
+        "passwordHint": "Le mot de passe doit contenir au moins 8 caractères et inclure au moins une lettre majuscule, un chiffre et un caractère spécial."
       },
       "twoFactor": {
         "title": "Authentification à deux facteurs",
