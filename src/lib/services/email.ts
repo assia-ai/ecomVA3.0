@@ -3,6 +3,7 @@ import { addDoc, getDocs, query, where, collection, updateDoc, doc, getDoc } fro
 import { emailsCollection, type EmailActivity } from '../collections';
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
+import i18next from 'i18next';
 
 /**
  * Retrieves the current user's Shopify shop domain and access token from Firestore
@@ -78,7 +79,7 @@ export async function createSampleEmailActivity(userId: string) {
     {
       subject: "Order #1234 Shipping Update",
       sender: "shipping@mystore.com",
-      category: "📦 Livraison / Suivi de commande",
+      category: `📦 ${i18next.t('preferences.categories.delivery')}`,
       status: "draft_created",
       draftUrl: "https://mail.google.com/mail/u/0/#drafts/abc123",
       body: "Hello, your order #1234 has been shipped and will arrive in 2-3 business days."
@@ -86,14 +87,14 @@ export async function createSampleEmailActivity(userId: string) {
     {
       subject: "Refund Request for Order #5678",
       sender: "customer@example.com",
-      category: "💸 Remboursement",
+      category: `💸 ${i18next.t('preferences.categories.refund')}`,
       status: "classified",
       body: "I would like to request a refund for my order #5678 as the item received was damaged."
     },
     {
       subject: "Pre-order Question about Product",
       sender: "potential.customer@email.com",
-      category: "🛍 Avant-vente",
+      category: `🛍 ${i18next.t('preferences.categories.presale')}`,
       status: "processed",
       body: "I'm interested in pre-ordering the new collection. When will it be available?"
     }
@@ -132,24 +133,26 @@ interface DraftResponse {
   output?: string;
 }
 
-// Standard category names
+// Standard categories with translations
 const STANDARD_CATEGORIES = [
-  '📦 Livraison / Suivi de commande',
-  '❌ Annulation',
-  '💸 Remboursement',
-  '🔁 Retour',
-  '🛍 Avant-vente',
-  '🔒 Résolu',
-  '🚫 Spam / à ignorer',
-  '🧾 Autres'
+  `📦 ${i18next.t('preferences.categories.delivery')}`,
+  `❌ ${i18next.t('preferences.categories.cancellation')}`,
+  `💸 ${i18next.t('preferences.categories.refund')}`,
+  `🔁 ${i18next.t('preferences.categories.return')}`,
+  `🛍 ${i18next.t('preferences.categories.presale')}`,
+  `🔒 ${i18next.t('preferences.categories.resolved')}`,
+  `🚫 ${i18next.t('preferences.categories.spam')}`,
+  `🧾 ${i18next.t('preferences.categories.other')}`
 ];
+
+const DEFAULT_CATEGORY = `🧾 ${i18next.t('preferences.categories.other')}`;
 
 // Normalize category name to match standard categories
 function normalizeCategory(category: string): string {
-  // Default category if we can't match
-  const DEFAULT_CATEGORY = '🧾 Autres';
-  
-  if (!category) return DEFAULT_CATEGORY;
+  if (!category || category === 'undefined' || category.trim() === '') {
+    console.log(`normalizeCategory: Received invalid category: "${category}", using default`);
+    return DEFAULT_CATEGORY;
+  }
   
   console.log(`normalizeCategory: Normalizing category: "${category}"`);
   
@@ -172,25 +175,25 @@ function normalizeCategory(category: string): string {
   const lowerCategory = category.toLowerCase();
   if (lowerCategory.includes('livraison') || lowerCategory.includes('delivery') || lowerCategory.includes('shipping')) {
     console.log(`normalizeCategory: Matched by keyword to delivery`);
-    return '📦 Livraison / Suivi de commande';
+    return `📦 ${i18next.t('preferences.categories.delivery')}`;
   } else if (lowerCategory.includes('annulation') || lowerCategory.includes('cancel')) {
     console.log(`normalizeCategory: Matched by keyword to cancellation`);
-    return '❌ Annulation';
+    return `❌ ${i18next.t('preferences.categories.cancellation')}`;
   } else if (lowerCategory.includes('remboursement') || lowerCategory.includes('refund')) {
     console.log(`normalizeCategory: Matched by keyword to refund`);
-    return '💸 Remboursement';
+    return `💸 ${i18next.t('preferences.categories.refund')}`;
   } else if (lowerCategory.includes('retour') || lowerCategory.includes('return')) {
     console.log(`normalizeCategory: Matched by keyword to return`);
-    return '🔁 Retour';
+    return `🔁 ${i18next.t('preferences.categories.return')}`;
   } else if (lowerCategory.includes('avant-vente') || lowerCategory.includes('presale') || lowerCategory.includes('question')) {
     console.log(`normalizeCategory: Matched by keyword to presale`);
-    return '🛍 Avant-vente';
+    return `🛍 ${i18next.t('preferences.categories.presale')}`;
   } else if (lowerCategory.includes('resolu') || lowerCategory.includes('resolved')) {
     console.log(`normalizeCategory: Matched by keyword to resolved`);
-    return '🔒 Résolu';
+    return `🔒 ${i18next.t('preferences.categories.resolved')}`;
   } else if (lowerCategory.includes('spam') || lowerCategory.includes('ignore')) {
     console.log(`normalizeCategory: Matched by keyword to spam`);
-    return '🚫 Spam / à ignorer';
+    return `🚫 ${i18next.t('preferences.categories.spam')}`;
   } 
   
   // Default fallback
@@ -199,9 +202,6 @@ function normalizeCategory(category: string): string {
 }
 
 export async function classifyEmail(subject: string, body: string): Promise<string> {
-  // Default fallback category
-  const DEFAULT_CATEGORY = '🧾 Autres';
-  
   try {
     // If webhook URL is not defined or invalid, return a fallback category
     if (!CLASSIFY_WEBHOOK_URL || CLASSIFY_WEBHOOK_URL.includes('undefined')) {
@@ -342,7 +342,7 @@ export async function generateDraftContent(
     const payload = {
       subject: subject || '',
       body: body || '',
-      category: category || '🧾 Autres',
+      category: category || DEFAULT_CATEGORY,
       sender: sender || '',
       signature: signature || '',
       emailAddress: emailAddress || '',
@@ -581,10 +581,13 @@ export async function saveEmailActivity(
       // We'll proceed to create a new record anyway as fallback
     }
     
-    // Default category if undefined or null
-    const safeCategory = (category !== undefined && category !== null && category !== '') 
-      ? category 
-      : '🧾 Autres';
+    // Ensure category is never undefined or empty string - use DEFAULT_CATEGORY as fallback
+    // Fix the issue with undefined category showing in the UI
+    const safeCategory = (category && category !== 'undefined' && category.trim() !== '') 
+      ? normalizeCategory(category)  // Normalize any valid category 
+      : DEFAULT_CATEGORY;            // Use default for empty/undefined values
+    
+    console.log(`saveEmailActivity: Using category "${safeCategory}" (original: "${category}")`);
     
     // Generate a unique ID for the activity
     const activityId = crypto.randomUUID();
@@ -596,7 +599,7 @@ export async function saveEmailActivity(
       subject: subject || '',
       sender: sender || '',
       timestamp: new Date(),
-      category: safeCategory,
+      category: safeCategory,  // Use our safely normalized category
       status: status || 'classified',
       draftUrl: draftUrl || null,
       body: body || null,

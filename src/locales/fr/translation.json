@@ -1,0 +1,461 @@
+{
+    "common": {
+      "signIn": "Se connecter",
+      "signUp": "S'inscrire", 
+      "getStarted": "Commencer",
+      "startFreeTrial": "Essai gratuit",
+      "startTrial": "Démarrer l'essai de 14 jours",
+      "login": "Connexion",
+      "getStartedFree": "Commencer gratuitement",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "loading": "Chargement...",
+      "comingSoon": "Bientôt disponible",
+      "connect": "Connecter",
+      "configure": "Configurer",
+      "user": "Utilisateur",
+      "all": "Tous",
+      "active": "actif",
+      "inactive": "inactif",
+      "notFound": "Page non trouvée",
+      "backToHome": "Retour à l'accueil",
+      "errors": {
+        "generic": "Une erreur s'est produite",
+        "notFound": "Ressource non trouvée",
+        "unauthorized": "Non autorisé",
+        "forbidden": "Accès refusé",
+        "validation": "Erreur de validation"
+      }
+    },
+    "navigation": {
+      "dashboard": "Tableau de bord",
+      "integrations": "Intégrations",
+      "preferences": "Préférences",
+      "billing": "Facturation",
+      "activityLog": "Journal d'activité",
+      "settings": "Paramètres"
+    },
+    "sidebar": {
+      "dashboard": "Tableau de bord",
+      "integrations": "Intégrations",
+      "preferences": "Préférences",
+      "activityLog": "Journal d'activité",
+      "settings": "Paramètres",
+      "help": "Aide",
+      "logout": "Déconnexion",
+      "freePlan": "Forfait Gratuit",
+      "proPlan": "Forfait Pro",
+      "upgrade": "Passer au Pro"
+    },
+    "landing": {
+      "hero": {
+        "title": "Gérez votre service client automatiquement avec IA",
+        "subtitle": "Automatisez le traitement des emails client pour votre boutique Shopify avec une classification intelligente et des réponses pré-rédigées."
+      },
+      "features": {
+        "title": "Tout ce dont vous avez besoin pour optimiser votre communication client",
+        "autoClassification": {
+          "title": "Classification automatique",
+          "description": "Classez automatiquement les emails entrants par catégorie: suivi de livraison, retours, remboursements, etc."
+        },
+        "aiGeneratedDrafts": {
+          "title": "Brouillons IA",
+          "description": "Créez des réponses automatiques basées sur les demandes des clients, prêtes pour votre révision et envoi."
+        },
+        "shopifyIntegration": {
+          "title": "Intégration Shopify",
+          "description": "Connectez votre boutique Shopify pour accéder aux données de commande et fournir des réponses plus précises."
+        },
+        "gmailLabels": {
+          "title": "Étiquettes Gmail",
+          "description": "Organisez automatiquement les emails avec des étiquettes Gmail personnalisées pour une meilleure gestion de votre boîte de réception."
+        },
+        "timeSaving": {
+          "title": "Gain de temps",
+          "description": "Économisez des heures chaque semaine sur le service client grâce au traitement automatique et à la rédaction de réponses."
+        },
+        "quickSetup": {
+          "title": "Installation rapide",
+          "description": "Commencez en quelques minutes avec notre processus d'intégration simple et notre assistant de configuration guidé."
+        }
+      },
+      "howItWorks": {
+        "title": "Comment ça marche",
+        "step1": {
+          "title": "Connectez vos comptes",
+          "description": "Intégrez votre compte Gmail et votre boutique Shopify en quelques clics.",
+          "point1": "Configuration simple et rapide",
+          "point2": "Accès sécurisé avec des permissions limitées"
+        },
+        "step2": {
+          "title": "Classification automatique",
+          "description": "L'IA analyse et classe automatiquement les emails entrants.",
+          "point1": "Détection automatique du type de demande",
+          "point2": "Organisation par catégories avec étiquettes Gmail"
+        },
+        "step3": {
+          "title": "Réponses assistées par IA",
+          "description": "Gagnez du temps avec des réponses pré-rédigées personnalisables.",
+          "point1": "Suggestions basées sur les données de commande",
+          "point2": "Prêtes à l'envoi après votre validation"
+        }
+      },
+      "pricing": {
+        "title": "Tarification simple et transparente",
+        "freePlan": {
+          "title": "Plan Gratuit",
+          "price": "0€",
+          "description": "Parfait pour les petits commerçants qui débutent avec l'automatisation des emails.",
+          "feature1": "Traitement jusqu'à 100 emails/mois",
+          "feature2": "Classification des emails",
+          "feature3": "Intégration Gmail de base",
+          "feature4": "Assistance communautaire"
+        },
+        "proPlan": {
+          "title": "Plan Pro",
+          "price": "29€",
+          "popular": "POPULAIRE",
+          "description": "Pour les entreprises en croissance qui ont besoin d'une gestion complète des emails.",
+          "feature1": "Traitement illimité des emails",
+          "feature2": "Réponses assistées par IA avancées",
+          "feature3": "Intégration Shopify complète",
+          "feature4": "Support prioritaire",
+          "feature5": "Analyses et statistiques détaillées"
+        }
+      },
+      "testimonials": {
+        "title": "Utilisé par les marchands Shopify",
+        "testimonial1": {
+          "text": "EcomVA nous a permis de réduire notre temps de gestion des emails de 70%. Le service client n'est plus un goulot d'étranglement pour notre croissance.",
+          "name": "Sophie Martin",
+          "company": "BoutiqueBio"
+        },
+        "testimonial2": {
+          "text": "La fonction de classification automatique est impressionnante. Notre équipe peut maintenant se concentrer sur les cas qui nécessitent vraiment une attention humaine.",
+          "name": "Thomas Dubois",
+          "company": "ModeExpress"
+        }
+      },
+      "finalCTA": {
+        "title": "Prêt à transformer votre gestion des emails clients?",
+        "subtitle": "Rejoignez les commerçants qui économisent des heures chaque semaine grâce au traitement automatisé des emails.",
+        "note": "Pas besoin de carte de crédit pour l'essai gratuit."
+      }
+    },
+    "footer": {
+      "description": "Automatisez votre service client avec l'IA pour votre boutique Shopify.",
+      "product": {
+        "title": "Produit",
+        "features": "Fonctionnalités",
+        "pricing": "Tarifs",
+        "integrations": "Intégrations"
+      },
+      "support": {
+        "title": "Support",
+        "helpCenter": "Centre d'aide",
+        "privacyPolicy": "Politique de confidentialité",
+        "termsOfService": "Conditions d'utilisation"
+      },
+      "contact": {
+        "title": "Contact",
+        "email": "support@ecomva.com"
+      },
+      "copyright": "Tous droits réservés"
+    },
+    "preferences": {
+      "title": "Préférences",
+      "description": "Personnalisez la façon dont ecomva traite vos emails",
+      "saveSuccess": "Préférences enregistrées avec succès",
+      "saveError": "Échec de l'enregistrement des préférences",
+      "automation": {
+        "title": "Paramètres d'automatisation",
+        "description": "Contrôlez comment les emails sont traités et rédigés",
+        "autoClassify": {
+          "title": "Classification automatique",
+          "description": "Activer la classification automatique des nouveaux emails",
+          "enable": "Activer la classification automatique",
+          "disable": "Désactiver la classification automatique"
+        },
+        "autoDraft": {
+          "title": "Brouillons automatiques",
+          "description": "Générer automatiquement des réponses pour les nouveaux emails",
+          "enable": "Activer les brouillons automatiques",
+          "disable": "Désactiver les brouillons automatiques"
+        }
+      },
+      "signature": {
+        "title": "Signature d'email",
+        "description": "Cette signature sera ajoutée à vos brouillons automatiques",
+        "placeholder": "Votre signature d'email...",
+        "note": "Utilisez HTML simple pour la mise en forme"
+      },
+      "categories": {
+        "title": "Catégories d'emails",
+        "description": "Masquer ou afficher des catégories dans l'interface",
+        "delivery": "Livraison / Suivi de commande",
+        "cancellation": "Annulation",
+        "refund": "Remboursement",
+        "return": "Retour",
+        "presale": "Avant-vente",
+        "resolved": "Résolu",
+        "spam": "Spam / à ignorer",
+        "other": "Autres",
+        "show": "Afficher la catégorie {{category}}",
+        "hide": "Masquer la catégorie {{category}}"
+      },
+      "saveButton": {
+        "default": "Enregistrer les préférences",
+        "saving": "Enregistrement...",
+        "saved": "Préférences enregistrées"
+      }
+    },
+    "integrations": {
+      "title": "Intégrations",
+      "description": "Connectez vos comptes externes pour accéder à toutes les fonctionnalités",
+      "loading": "Chargement de vos intégrations...",
+      "errors": {
+        "notLoggedIn": "Vous devez être connecté pour effectuer cette action",
+        "fetchFailed": "Échec du chargement des intégrations"
+      },
+      "gmail": {
+        "title": "Gmail",
+        "description": "Connectez votre compte Gmail pour automatiser la gestion des emails",
+        "connected": "Connecté",
+        "notConnected": "Non connecté",
+        "connect": "Connecter Gmail",
+        "disconnect": "Déconnecter",
+        "viewLabels": "Voir les étiquettes",
+        "labels": "Étiquettes Gmail",
+        "refreshLabels": "Actualiser les étiquettes",
+        "createLabels": "Créer toutes les étiquettes",
+        "closeModal": "Fermer",
+        "authProcessing": "Connexion à Gmail en cours...",
+        "waitMessage": "Veuillez patienter pendant que nous traitons votre connexion Google. Ne fermez pas cette fenêtre.",
+        "permissions": {
+          "title": "Permissions requises",
+          "readEmails": "Lire les emails",
+          "sendEmails": "Envoyer des emails",
+          "manageLabels": "Gérer les étiquettes",
+          "viewProfile": "Voir votre profil"
+        },
+        "setup": {
+          "title": "Configuration Gmail",
+          "step1": "1. Se connecter avec Google",
+          "step2": "2. Autoriser les permissions",
+          "step3": "3. Configurer les étiquettes",
+          "complete": "Configuration terminée"
+        },
+        "errorExpired": "Votre connexion Gmail a expiré. Veuillez reconnecter votre compte.",
+        "connectError": "Échec de la connexion au compte Gmail",
+        "connectSuccess": "Compte Gmail connecté : {{email}}",
+        "reconnect": "Reconnecter",
+        "connectGoogle": "Connectez votre compte Google",
+        "labelDescription": "Utilisez les étiquettes Gmail pour organiser vos e-mails par catégorie.",
+        "loadingLabels": "Chargement...",
+        "labelError": "Impossible de récupérer les étiquettes",
+        "noIntegration": "Aucune intégration Gmail trouvée. Veuillez connecter votre compte Gmail.",
+        "labelsCreated": "Étiquettes de catégorie créées dans Gmail",
+        "labelsError": "Échec de la création des étiquettes Gmail. Veuillez réessayer."
+      },
+      "outlook": {
+        "connectMicrosoft": "Connectez votre compte Microsoft",
+        "connected": "Connecté",
+        "disconnect": "Déconnecter",
+        "connect": "Connecter Outlook",
+        "connectSuccess": "Outlook connecté avec succès",
+        "disconnectSuccess": "Outlook déconnecté"
+      },
+      "shopify": {
+        "title": "Shopify",
+        "description": "Connectez votre boutique Shopify pour accéder aux données de commande",
+        "storeUrl": "URL de la boutique",
+        "apiToken": "Jeton d'API",
+        "connect": "Connecter Shopify",
+        "disconnect": "Déconnecter",
+        "connected": "Connecté",
+        "notConnected": "Non connecté",
+        "howToFind": "Comment trouver votre jeton API?",
+        "instructions": {
+          "title": "Instructions",
+          "step1": "1. Connectez-vous à votre tableau de bord Shopify",
+          "step2": "2. Allez dans Paramètres > Applications",
+          "step3": "3. Créez une application privée",
+          "step4": "4. Copiez le jeton d'API"
+        },
+        "errorMissingFields": "Veuillez saisir à la fois l'URL Shopify et le jeton d'accès",
+        "connectSuccess": "Boutique Shopify connectée avec succès",
+        "disconnectSuccess": "Boutique Shopify déconnectée",
+        "disconnectError": "Échec de la déconnexion de la boutique Shopify",
+        "connectedDescription": "Votre boutique est connectée et nous pouvons accéder aux données de commande."
+      },
+      "permissions": {
+        "title": "Autorisations requises",
+        "description": "Pour fonctionner correctement, cette application a besoin d'accéder à vos e-mails et données de boutique. Nous ne stockons que les métadonnées nécessaires."
+      }
+    },
+    "settings": {
+      "title": "Paramètres du compte",
+      "description": "Gérez vos informations personnelles et paramètres de sécurité",
+      "profile": {
+        "title": "Profil",
+        "description": "Mettez à jour vos informations personnelles",
+        "name": "Nom complet",
+        "email": "Adresse email",
+        "updateProfile": "Mettre à jour le profil",
+        "profileUpdated": "Profil mis à jour"
+      },
+      "password": {
+        "title": "Mot de passe",
+        "description": "Mettez à jour votre mot de passe",
+        "current": "Mot de passe actuel",
+        "new": "Nouveau mot de passe",
+        "confirm": "Confirmer le mot de passe",
+        "updatePassword": "Mettre à jour le mot de passe",
+        "passwordUpdated": "Mot de passe mis à jour",
+        "passwordMismatch": "Les mots de passe ne correspondent pas"
+      },
+      "account": {
+        "title": "Compte",
+        "description": "Gérez votre abonnement et les paramètres du compte",
+        "plan": "Votre forfait",
+        "freePlan": "Forfait Gratuit",
+        "proPlan": "Forfait Pro",
+        "upgrade": "Passer au forfait Pro",
+        "billing": "Facturation",
+        "manageBilling": "Gérer la facturation",
+        "deleteAccount": "Supprimer le compte",
+        "deleteWarning": "Cette action est irréversible. Toutes vos données seront définitivement effacées."
+      },
+      "twoFactor": {
+        "title": "Authentification à deux facteurs",
+        "description": "Ajoutez une couche de sécurité supplémentaire à votre compte",
+        "enable": "Activer l'authentification à deux facteurs",
+        "disable": "Désactiver l'authentification à deux facteurs",
+        "scanQr": "Scannez le code QR avec votre application d'authentification",
+        "enterCode": "Entrez le code à 6 chiffres",
+        "verifyCode": "Vérifier le code",
+        "backup": "Codes de secours",
+        "backupDescription": "Conservez ces codes en lieu sûr en cas de perte d'accès à votre appareil d'authentification"
+      }
+    },
+    "dashboard": {
+      "title": "Tableau de bord",
+      "welcome": "Bienvenue sur EcomVA",
+      "welcomeMessage": "Gérez vos emails client efficacement avec l'assistance IA",
+      "stats": {
+        "emailsProcessed": "Emails traités",
+        "autoResponses": "Réponses automatiques",
+        "categories": "Catégories",
+        "responseRate": "Taux de réponse",
+        "today": "aujourd'hui",
+        "thisWeek": "cette semaine",
+        "thisMonth": "ce mois-ci",
+        "allTime": "au total"
+      },
+      "recentActivity": {
+        "title": "Activité récente",
+        "viewAll": "Voir tout",
+        "noActivity": "Aucune activité récente",
+        "emailProcessed": "Email traité",
+        "responseGenerated": "Réponse générée",
+        "emailCategorized": "Email catégorisé"
+      },
+      "setup": {
+        "title": "Complétez votre configuration",
+        "gmail": {
+          "title": "Connectez votre compte Gmail",
+          "description": "Intégrez votre boîte mail pour automatiser le traitement des emails"
+        },
+        "shopify": {
+          "title": "Connectez votre boutique Shopify",
+          "description": "Accédez aux données de commande pour des réponses plus précises"
+        },
+        "preferences": {
+          "title": "Configurez vos préférences",
+          "description": "Personnalisez vos paramètres de réponse email"
+        }
+      },
+      "quickActions": {
+        "title": "Actions rapides",
+        "processNew": "Traiter les nouveaux emails",
+        "viewAll": "Voir tous les emails",
+        "settings": "Paramètres"
+      }
+    },
+    "activity": {
+      "title": "Journal d'activité",
+      "description": "Historique des emails traités et des actions effectuées",
+      "filters": "Filtres",
+      "categoryLabel": "Catégories",
+      "categories": "Catégories",
+      "search": "Rechercher",
+      "dateRange": {
+        "label": "Période",
+        "today": "Aujourd'hui",
+        "yesterday": "Hier",
+        "lastWeek": "7 derniers jours",
+        "lastMonth": "30 derniers jours",
+        "custom": "Personnalisé"
+      },
+      "noFilterResults": "Aucun résultat trouvé avec les filtres sélectionnés",
+      "noResults": "Aucun email traité trouvé",
+      "table": {
+        "email": "Email",
+        "subject": "Objet",
+        "category": "Catégorie",
+        "date": "Date",
+        "status": "Statut",
+        "actions": "Actions",
+        "view": "Voir",
+        "delete": "Supprimer"
+      },
+      "status": {
+        "processed": "Traité",
+        "drafted": "Brouillon",
+        "sent": "Envoyé",
+        "failed": "Échoué",
+        "ignored": "Ignoré"
+      },
+      "pagination": {
+        "previous": "Précédent",
+        "next": "Suivant",
+        "of": "de",
+        "showing": "Affichage de",
+        "to": "à",
+        "results": "résultats"
+      }
+    },
+    "categories": {
+      "delivery": "Livraison / Suivi de commande",
+      "cancellation": "Annulation",
+      "refund": "Remboursement",
+      "return": "Retour",
+      "presale": "Avant-vente",
+      "resolved": "Résolu",
+      "spam": "Spam / à ignorer",
+      "other": "Autres"
+    },
+    "auth": {
+      "title": "Authentification",
+      "login": "Connexion",
+      "signup": "Inscription",
+      "logout": "Déconnexion",
+      "forgotPassword": "Mot de passe oublié ?",
+      "resetPassword": "Réinitialiser le mot de passe",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "name": "Nom",
+      "errors": {
+        "invalidEmail": "Email invalide",
+        "invalidPassword": "Le mot de passe doit contenir au moins 8 caractères",
+        "passwordMismatch": "Les mots de passe ne correspondent pas",
+        "emailInUse": "Cet email est déjà utilisé",
+        "wrongCredentials": "Email ou mot de passe incorrect",
+        "accountNotFound": "Aucun compte trouvé avec cet email"
+      }
+    },
+    "success": {
+      "emailsRefreshed": "Emails actualisés avec succès"
+    }
+}

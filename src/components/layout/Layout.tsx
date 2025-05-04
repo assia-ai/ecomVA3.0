@@ -3,9 +3,11 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { Menu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="flex h-screen bg-gray-50 relative">
@@ -14,6 +16,7 @@ const Layout: React.FC = () => {
         <div 
           className="fixed inset-0 bg-gray-800 bg-opacity-50 z-20 lg:hidden" 
           onClick={() => setSidebarOpen(false)}
+          aria-label={t('common.closeSidebar')}
         />
       )}
       

@@ -22,21 +22,12 @@ import { GmailService } from '../../lib/services/gmail';
 import EmailDetailsModal from '../../components/modals/EmailDetailsModal';
 import type { EmailActivity } from '../../lib/collections';
 import { useEmailProcessing } from '../../lib/hooks/useEmailProcessing';
-
-const categories = [
-  { id: 'delivery', emoji: '📦', name: 'Livraison / Suivi de commande' },
-  { id: 'cancellation', emoji: '❌', name: 'Annulation' },
-  { id: 'refund', emoji: '💸', name: 'Remboursement' },
-  { id: 'return', emoji: '🔁', name: 'Retour' },
-  { id: 'presale', emoji: '🛍', name: 'Avant-vente' },
-  { id: 'resolved', emoji: '🔒', name: 'Résolu' },
-  { id: 'spam', emoji: '🚫', name: 'Spam / à ignorer' },
-  { id: 'other', emoji: '🧾', name: 'Autres' }
-];
+import { useTranslation } from 'react-i18next';
 
 const ActivityLogPage: React.FC = () => {
   const { currentUser, userProfile } = useAuth();
   const { fetchAndProcessEmails } = useEmailProcessing();
+  const { t } = useTranslation();
   const [activities, setActivities] = useState<EmailActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmail, setSelectedEmail] = useState<EmailActivity | null>(null);
@@ -48,6 +39,17 @@ const ActivityLogPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [hasIntegrations, setHasIntegrations] = useState(false);
+  
+  const categories = [
+    { id: 'delivery', emoji: '📦', name: t('preferences.categories.delivery') },
+    { id: 'cancellation', emoji: '❌', name: t('preferences.categories.cancellation') },
+    { id: 'refund', emoji: '💸', name: t('preferences.categories.refund') },
+    { id: 'return', emoji: '🔁', name: t('preferences.categories.return') },
+    { id: 'presale', emoji: '🛍', name: t('preferences.categories.presale') },
+    { id: 'resolved', emoji: '🔒', name: t('preferences.categories.resolved') },
+    { id: 'spam', emoji: '🚫', name: t('preferences.categories.spam') },
+    { id: 'other', emoji: '🧾', name: t('preferences.categories.other') }
+  ];
   
   // Check if user has email integrations
   useEffect(() => {
@@ -102,7 +104,7 @@ const ActivityLogPage: React.FC = () => {
   
   const handleRefreshEmails = async () => {
     if (!currentUser) {
-      toast.error('You need to be logged in to fetch emails');
+      toast.error(t('errors.notLoggedIn'));
       return;
     }
     
@@ -110,10 +112,10 @@ const ActivityLogPage: React.FC = () => {
     
     try {
       await fetchAndProcessEmails();
-      toast.success('Emails refreshed successfully');
+      toast.success(t('success.emailsRefreshed'));
     } catch (error) {
       console.error('Failed to refresh emails:', error);
-      toast.error('Failed to refresh emails');
+      toast.error(t('errors.failedToRefreshEmails'));
     } finally {
       setFetchingEmails(false);
     }
@@ -150,13 +152,13 @@ const ActivityLogPage: React.FC = () => {
         setInitialLoad(false);
       } catch (error) {
         console.error('Error processing activities:', error);
-        toast.error('Failed to process activities');
+        toast.error(t('errors.failedToProcessActivities'));
         setLoading(false);
         setInitialLoad(false);
       }
     }, (error) => {
       console.error('Error fetching activities:', error);
-      toast.error('Failed to load activities');
+      toast.error(t('errors.failedToLoadActivities'));
       setLoading(false);
       setInitialLoad(false);
     });
@@ -186,9 +188,9 @@ const ActivityLogPage: React.FC = () => {
   
   // Status options
   const statusOptions = [
-    { value: 'classified', label: 'Classified Only' },
-    { value: 'draft_created', label: 'Draft Created' },
-    { value: 'processed', label: 'Fully Processed' }
+    { value: 'classified', label: t('status.classified') },
+    { value: 'draft_created', label: t('status.draftCreated') },
+    { value: 'processed', label: t('status.processed') }
   ];
   
   // Clear all filters
@@ -201,8 +203,8 @@ const ActivityLogPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h2 className="text-xl font-semibold text-gray-900">Activity Log</h2>
-        <p className="text-gray-600">Track and monitor processed emails</p>
+        <h2 className="text-xl font-semibold text-gray-900">{t('activity.title')}</h2>
+        <p className="text-gray-600">{t('activity.description')}</p>
       </div>
       
       {/* Filters */}
@@ -211,7 +213,7 @@ const ActivityLogPage: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div className="w-full">
               <Input
-                placeholder="Search emails..."
+                placeholder={t('activity.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 leftIcon={<Search className="h-5 w-5 text-gray-400" />}
@@ -226,14 +228,14 @@ const ActivityLogPage: React.FC = () => {
                 onClick={() => setFilterOpen(!filterOpen)}
                 className="flex-grow md:flex-grow-0"
               >
-                Filter
+                {t('activity.filter')}
               </Button>
               <Button 
                 variant="outline"
                 leftIcon={<Calendar className="h-4 w-4" />}
                 className="flex-grow md:flex-grow-0"
               >
-                Last 7 days
+                {t('activity.dateRange.lastWeek')}
               </Button>
               <Button
                 variant="primary"
@@ -243,7 +245,7 @@ const ActivityLogPage: React.FC = () => {
                 disabled={!hasIntegrations}
                 className="flex-grow md:flex-grow-0"
               >
-                Fetch New Emails
+                {t('activity.fetchNewEmails')}
               </Button>
             </div>
           </div>
@@ -254,14 +256,14 @@ const ActivityLogPage: React.FC = () => {
               <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category
+                    {t('activity.categoryLabel')}
                   </label>
                   <select
                     className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     value={selectedCategory || ''}
                     onChange={(e) => setSelectedCategory(e.target.value || null)}
                   >
-                    <option value="">All Categories</option>
+                    <option value="">{t('activity.allCategories')}</option>
                     {uniqueCategories.map((category) => (
                       <option key={category} value={category} className="flex items-center">
                         {categories.find(c => c.name === category)?.emoji} {category}
@@ -271,17 +273,17 @@ const ActivityLogPage: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
+                    {t('activity.table.status')}
                   </label>
                   <select
                     className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
                     value={selectedStatus || ''}
                     onChange={(e) => setSelectedStatus(e.target.value || null)}
                   >
-                    <option value="">All Statuses</option>
+                    <option value="">{t('activity.allStatuses')}</option>
                     {statusOptions.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(`activity.statusOptions.${option.value}`)}
                       </option>
                     ))}
                   </select>
@@ -293,7 +295,7 @@ const ActivityLogPage: React.FC = () => {
                   size="sm"
                   onClick={clearFilters}
                 >
-                  Clear Filters
+                  {t('activity.clearFilters')}
                 </Button>
               </div>
             </div>
@@ -306,12 +308,14 @@ const ActivityLogPage: React.FC = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Email Activity</CardTitle>
+              <CardTitle>{t('activity.emailActivity')}</CardTitle>
               {loading || initialLoad ? (
-                <CardDescription>Loading activities...</CardDescription>
+                <CardDescription>{t('activity.loadingActivities')}</CardDescription>
               ) : (
                 <CardDescription>
-                  {filteredActivities.length} {filteredActivities.length === 1 ? 'email' : 'emails'} processed
+                  {t('activity.emailsProcessed', { 
+                    count: filteredActivities.length,
+                  })}
                 </CardDescription>
               )}
             </div>
@@ -340,11 +344,13 @@ const ActivityLogPage: React.FC = () => {
                       <div className="flex flex-wrap items-center gap-2 mb-1">
                         <h4 className="text-base font-medium text-gray-900 break-words">{activity.subject}</h4>
                         <span className="text-sm px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 whitespace-nowrap">
-                          {activity.category}
+                          {activity.category === 'undefined' || !activity.category || activity.category === undefined
+                            ? `🧾 ${t('preferences.categories.other')}`
+                            : activity.category}
                         </span>
                       </div>
                       <p className="text-sm text-gray-500">
-                        From: {activity.sender}
+                        {t('activity.from')}: {activity.sender}
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center justify-between gap-2 mt-1">
@@ -357,9 +363,7 @@ const ActivityLogPage: React.FC = () => {
                             ? 'bg-success-100 text-success-800' 
                             : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {activity.status === 'classified' && 'Classified'}
-                          {activity.status === 'draft_created' && 'Draft Created'}
-                          {activity.status === 'processed' && 'Processed'}
+                          {t(`activity.status.${activity.status}`)}
                         </span>
                         {activity.draftUrl && (
                           <Button 
@@ -371,7 +375,7 @@ const ActivityLogPage: React.FC = () => {
                             }}
                             rightIcon={<ExternalLink className="h-3 w-3" />}
                           >
-                            View Draft
+                            {t('activity.viewDraft')}
                           </Button>
                         )}
                       </div>
@@ -385,15 +389,15 @@ const ActivityLogPage: React.FC = () => {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-100">
                 <AlertCircle className="h-6 w-6 text-amber-600" />
               </div>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No email accounts connected</h3>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">{t('activity.noEmailAccounts')}</h3>
               <p className="mt-1 text-sm text-gray-500">
-                You need to connect an email account before emails can be processed.
+                {t('activity.needConnectionDescription')}
               </p>
               <div className="mt-6">
                 <Button
                   onClick={() => window.location.href = '/integrations'}
                 >
-                  Connect Email Account
+                  {t('activity.connectEmailAccount')}
                 </Button>
               </div>
             </div>
@@ -402,16 +406,16 @@ const ActivityLogPage: React.FC = () => {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
                 <Search className="h-6 w-6 text-gray-400" />
               </div>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No emails processed yet</h3>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">{t('activity.noEmailsProcessed')}</h3>
               <p className="mt-1 text-sm text-gray-500">
-                Click "Fetch New Emails" to process your inbox, or wait for the automatic processing to run.
+                {t('activity.processEmailsDescription')}
               </p>
               <div className="mt-6">
                 <Button
                   onClick={handleRefreshEmails}
                   isLoading={fetchingEmails}
                 >
-                  Fetch New Emails
+                  {t('activity.fetchNewEmails')}
                 </Button>
               </div>
             </div>

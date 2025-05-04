@@ -18,6 +18,8 @@ import { useAuth } from './contexts/AuthContext';
 import BackgroundProcessor from './components/BackgroundProcessor';
 import { storeUserSession, updateLastActive } from './lib/services/auth-persistence';
 import LandingPage from './pages/landing/LandingPage'; // Import landing page
+import PrivacyPolicyPage from './pages/landing/PrivacyPolicyPage'; // Import privacy policy page
+import TermsOfServicePage from './pages/landing/TermsOfServicePage'; // Import terms of service page
 
 // EmailProcessor component to handle background email processing
 const EmailProcessor: React.FC = () => {
@@ -105,6 +107,12 @@ function App() {
             <Route path="activity" element={<ActivityLogPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
+
+          {/* Add privacy policy page route */}
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+
+          {/* Add terms of service page route */}
+          <Route path="/terms-of-service" element={<TermsOfServicePage />} />
         </Routes>
       </Router>
     </AuthProvider>

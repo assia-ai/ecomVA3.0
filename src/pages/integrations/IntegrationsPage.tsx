@@ -21,14 +21,18 @@ import { useAuth } from '../../contexts/AuthContext';
 import GmailSignInModal from '../../components/modals/GmailSignInModal';
 import GmailLabelsModal from '../../components/modals/GmailLabelsModal';
 import { getUserIntegrations, removeIntegration, getIntegration } from '../../lib/services/integrations';
+import { useTranslation } from 'react-i18next';
 
 const IntegrationsPage: React.FC = () => {
+  const { t, i18n } = useTranslation(); // Moved inside the component
   const { currentUser, gmailAuthError, resetGmailAuthError } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   
   // Loading state for initial page load
   const [initialLoading, setInitialLoading] = useState(true);
+  // Loading state for OAuth redirect processing
+  const [redirectLoading, setRedirectLoading] = useState(false);
   
   // Modal states
   const [isGmailModalOpen, setIsGmailModalOpen] = useState(false);
@@ -65,7 +69,7 @@ const IntegrationsPage: React.FC = () => {
       setIsGmailModalOpen(true);
       
       if (isGmailConnected) {
-        toast.error('Your Gmail connection has expired. Please reconnect your account.');
+        toast.error(t('integrations.gmail.errorExpired'));
         setIsGmailConnected(false);
       }
     };
@@ -136,18 +140,21 @@ const IntegrationsPage: React.FC = () => {
       if (code) {
         try {
           setEmailLoading(true);
+          setRedirectLoading(true); // Activer le loading de redirection
+          
           const email = await GmailService.handleOAuthCallback(currentUser.uid, code);
           setIsGmailConnected(true);
           setConnectedGmailEmail(email);
-          toast.success(`Connected Gmail account: ${email}`);
+          toast.success(t('integrations.gmail.connectSuccess', { email }));
           
           // Reload integrations to get the Gmail integration
           await loadIntegrations();
         } catch (error) {
           console.error('Gmail connection error:', error);
-          toast.error('Failed to connect Gmail account');
+          toast.error(t('integrations.gmail.connectError'));
         } finally {
           setEmailLoading(false);
+          setRedirectLoading(false); // Désactiver le loading de redirection
           // Clear the URL hash
           window.history.replaceState(null, '', location.pathname);
         }
@@ -160,7 +167,7 @@ const IntegrationsPage: React.FC = () => {
   // Handlers for Shopify integration
   const handleShopifyConnect = async () => {
     if (!shopifyUrl || !shopifyToken) {
-      toast.error('Please enter both Shopify URL and access token');
+      toast.error(t('integrations.shopify.errorMissingFields'));
       return;
     }
     
@@ -174,7 +181,7 @@ const IntegrationsPage: React.FC = () => {
       );
       
       setIsShopifyConnected(true);
-      toast.success('Shopify store connected successfully');
+      toast.success(t('integrations.shopify.connectSuccess'));
       
       // Reload integrations to refresh state
       await loadIntegrations();
@@ -199,7 +206,7 @@ const IntegrationsPage: React.FC = () => {
       toast.success('Shopify store disconnected');
     } catch (error) {
       console.error('Failed to disconnect Shopify:', error);
-      toast.error('Failed to disconnect Shopify store');
+      toast.error(t('integrations.shopify.disconnectError'));
     } finally {
       setShopifyLoading(false);
     }
@@ -262,7 +269,7 @@ const IntegrationsPage: React.FC = () => {
   // Handle Gmail Labels
   const fetchGmailLabels = async () => {
     if (!currentUser) {
-      toast.error('You need to be logged in to view Gmail labels');
+      toast.error(t('integrations.errors.notLoggedIn'));
       return;
     }
     
@@ -275,7 +282,7 @@ const IntegrationsPage: React.FC = () => {
       
       if (!freshIntegration) {
         console.error('No Gmail integration found when trying to fetch labels');
-        toast.error('No Gmail integration found. Please connect your Gmail account.');
+        toast.error(t('integrations.gmail.noIntegration'));
         setLoadingLabels(false);
         return;
       }
@@ -302,7 +309,7 @@ const IntegrationsPage: React.FC = () => {
             error.message.includes('invalid') || 
             error.message.includes('expired')))) {
         
-        toast.error('Your Gmail connection has expired. Please reconnect your account.');
+        toast.error(t('integrations.gmail.errorExpired'));
         
         // Disconnect the expired Gmail account
         if (currentUser) {
@@ -319,7 +326,7 @@ const IntegrationsPage: React.FC = () => {
           }
         }
       } else {
-        toast.error('Failed to fetch Gmail labels. Please try again.');
+        toast.error(t('integrations.gmail.labelsError'));
       }
     } finally {
       setLoadingLabels(false);
@@ -371,7 +378,7 @@ const IntegrationsPage: React.FC = () => {
             error.message.includes('invalid') || 
             error.message.includes('expired')))) {
         
-        toast.error('Your Gmail connection has expired. Please reconnect your account.');
+        toast.error(t('integrations.gmail.errorExpired'));
         
         // Disconnect the expired Gmail account
         if (currentUser) {
@@ -400,7 +407,23 @@ const IntegrationsPage: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <Loader className="w-10 h-10 text-primary-500 animate-spin" />
-        <p className="mt-4 text-gray-600">Loading your integrations...</p>
+        <p className="mt-4 text-gray-600">{t('integrations.loading')}</p>
+      </div>
+    );
+  }
+  
+  // Si nous sommes en train de traiter une redirection OAuth, afficher un écran de chargement spécifique
+  if (redirectLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+          <div className="flex flex-col items-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" alt="Gmail" className="h-16 w-16 mb-4" />
+            <Loader className="w-10 h-10 text-primary-500 animate-spin mb-4" />
+            <h2 className="text-xl font-semibold mb-2 text-center">{t('integrations.gmail.authProcessing')}</h2>
+            <p className="text-gray-600 text-center">{t('integrations.gmail.waitMessage')}</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -408,8 +431,8 @@ const IntegrationsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h2 className="text-xl font-semibold text-gray-900">Integrations</h2>
-        <p className="text-gray-600">Connect your accounts to enable automatic email processing</p>
+        <h2 className="text-xl font-semibold text-gray-900">{t('integrations.title')}</h2>
+        <p className="text-gray-600">{t('integrations.description')}</p>
       </div>
       
       {/* Shopify Integration */}
@@ -420,8 +443,8 @@ const IntegrationsPage: React.FC = () => {
               <ShoppingCart className="h-5 w-5 text-green-600" />
             </div>
             <div>
-              <CardTitle>Shopify Integration</CardTitle>
-              <CardDescription>Connect your Shopify store to access order data</CardDescription>
+              <CardTitle>{t('integrations.shopify.title')}</CardTitle>
+              <CardDescription>{t('integrations.shopify.description')}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -429,18 +452,18 @@ const IntegrationsPage: React.FC = () => {
           {!isShopifyConnected ? (
             <div className="space-y-4">
               <Input 
-                label="Shopify Store URL"
+                label={t('integrations.shopify.storeUrl')}
                 placeholder="yourstorename.myshopify.com"
                 value={shopifyUrl}
                 onChange={(e) => setShopifyUrl(e.target.value)}
                 fullWidth
               />
               <Input 
-                label="Shopify Access Token"
+                label={t('integrations.shopify.apiToken')}
                 placeholder="shpat_xxxxxxxxxxxx"
                 value={shopifyToken}
                 onChange={(e) => setShopifyToken(e.target.value)}
-                helperText="You can find this in your Shopify admin under Apps > Develop apps > Create an app"
+                helperText={t('integrations.shopify.instructions.title')}
                 type="password"
                 fullWidth
               />
@@ -452,10 +475,12 @@ const IntegrationsPage: React.FC = () => {
                   <CheckCircle className="h-5 w-5 text-success-600 mr-2 flex-shrink-0" />
                   <span className="font-medium text-gray-900 break-all">{shopifyUrl}</span>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-success-100 text-success-800 self-start sm:self-auto">Connected</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-success-100 text-success-800 self-start sm:self-auto">
+                  {t('integrations.shopify.connected')}
+                </span>
               </div>
               <p className="mt-2 text-sm text-gray-600">
-                Your store is connected and we can access order data.
+                {t('integrations.shopify.connectedDescription')}
               </p>
             </div>
           )}
@@ -467,7 +492,7 @@ const IntegrationsPage: React.FC = () => {
               isLoading={shopifyLoading}
               leftIcon={<LinkIcon className="h-4 w-4" />}
             >
-              Connect Shopify
+              {t('integrations.shopify.connect')}
             </Button>
           ) : (
             <Button
@@ -476,7 +501,7 @@ const IntegrationsPage: React.FC = () => {
               isLoading={shopifyLoading}
               leftIcon={<Trash2 className="h-4 w-4" />}
             >
-              Disconnect Store
+              {t('integrations.shopify.disconnect')}
             </Button>
           )}
         </CardFooter>
@@ -490,8 +515,8 @@ const IntegrationsPage: React.FC = () => {
               <Mail className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <CardTitle>Email Accounts</CardTitle>
-              <CardDescription>Connect your email accounts to read and create drafts</CardDescription>
+              <CardTitle>{t('integrations.gmail.title')}</CardTitle>
+              <CardDescription>{t('integrations.gmail.description')}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -505,18 +530,21 @@ const IntegrationsPage: React.FC = () => {
                   <div>
                     <h4 className="text-base font-medium text-gray-900">Gmail</h4>
                     <p className="text-sm text-gray-500 break-all">
-                      {isGmailConnected ? connectedGmailEmail : 'Connect your Google account'}
+                      {isGmailConnected ? connectedGmailEmail : t('integrations.gmail.connectGoogle')}
                     </p>
                   </div>
                 </div>
                 {isGmailConnected ? (
                   <div className="flex items-center space-x-2 flex-wrap sm:flex-nowrap">
-                    <span className="text-xs px-2 py-1 rounded-full bg-success-100 text-success-800">Connected</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-success-100 text-success-800">
+                      {t('integrations.gmail.connected')}
+                    </span>
                     <Button 
                       variant="ghost" 
                       size="sm"
                       onClick={fetchGmailLabels}
                       disabled={loadingLabels}
+                      aria-label={t('integrations.gmail.viewLabels')}
                     >
                       <Tag className="h-4 w-4 text-gray-500" />
                     </Button>
@@ -524,6 +552,7 @@ const IntegrationsPage: React.FC = () => {
                       variant="ghost" 
                       size="sm"
                       onClick={handleGmailDisconnect}
+                      aria-label={t('integrations.gmail.disconnect')}
                     >
                       <Trash2 className="h-4 w-4 text-gray-500" />
                     </Button>
@@ -537,7 +566,7 @@ const IntegrationsPage: React.FC = () => {
                     className="w-full sm:w-auto"
                     leftIcon={<RefreshCw className="h-3 w-3 mr-1" />}
                   >
-                    {gmailAuthError ? 'Reconnect' : 'Connect'}
+                    {gmailAuthError ? t('integrations.gmail.reconnect') : t('integrations.gmail.connect')}
                   </Button>
                 )}
               </div>
@@ -546,13 +575,13 @@ const IntegrationsPage: React.FC = () => {
                 <div className="mt-3 p-2 bg-blue-50 rounded text-sm text-blue-700 flex items-start">
                   <Tag className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
                   <p>
-                    Email categories are automatically applied as labels in Gmail. 
+                    {t('integrations.gmail.labelDescription')}
                     <button 
                       onClick={fetchGmailLabels}
                       className="ml-1 underline hover:text-blue-900 focus:outline-none"
                       disabled={loadingLabels}
                     >
-                      {loadingLabels ? 'Loading...' : 'View labels'}
+                      {loadingLabels ? t('integrations.gmail.loadingLabels') : t('integrations.gmail.viewLabels')}
                     </button>
                   </p>
                 </div>
@@ -566,16 +595,19 @@ const IntegrationsPage: React.FC = () => {
                   <img src="https://upload.wikimedia.org/wikipedia/commons/d/df/Microsoft_Office_Outlook_%282018%E2%80%93present%29.svg" alt="Outlook" className="h-8 w-8" />
                   <div>
                     <h4 className="text-base font-medium text-gray-900">Outlook</h4>
-                    <p className="text-sm text-gray-500">Connect your Microsoft account</p>
+                    <p className="text-sm text-gray-500">
+                      {t('integrations.outlook.connectMicrosoft')}
+                    </p>
                   </div>
                 </div>
                 {isOutlookConnected ? (
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-success-100 text-success-800">Connected</span>
+                    <span className="text-xs px-2 py-1 rounded-full bg-success-100 text-success-800">{t('integrations.outlook.connected')}</span>
                     <Button 
                       variant="ghost" 
                       size="sm"
                       onClick={handleOutlookDisconnect}
+                      aria-label={t('integrations.outlook.disconnect')}
                     >
                       <Trash2 className="h-4 w-4 text-gray-500" />
                     </Button>
@@ -588,7 +620,7 @@ const IntegrationsPage: React.FC = () => {
                     isLoading={emailLoading}
                     className="w-full sm:w-auto"
                   >
-                    Connect
+                    {t('integrations.outlook.connect')}
                   </Button>
                 )}
               </div>
@@ -599,8 +631,8 @@ const IntegrationsPage: React.FC = () => {
           <div className="w-full bg-amber-50 text-amber-800 px-4 py-3 rounded-md flex items-start">
             <AlertTriangle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium">Read & Draft Permissions Only</p>
-              <p className="mt-1">ecommva will only read your emails and create drafts. It will never send emails without your review and approval.</p>
+              <p className="font-medium">{t('integrations.permissions.title')}</p>
+              <p className="mt-1">{t('integrations.permissions.description')}</p>
             </div>
           </div>
         </CardFooter>

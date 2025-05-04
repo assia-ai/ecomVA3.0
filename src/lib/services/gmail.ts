@@ -1,11 +1,12 @@
 import axios from 'axios';
+import i18next from 'i18next';
 import { saveIntegration, removeIntegration } from './integrations';
 import { classifyEmail, saveEmailActivity, generateDraftContent } from './email';
 
 const GMAIL_BASE_URL = 'https://gmail.googleapis.com/gmail/v1/users/me';
 const GMAIL_OAUTH_SCOPE = 'https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 const GMAIL_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const GMAIL_REDIRECT_URI = `${window.location.origin}/integrations`;
+const GMAIL_REDIRECT_URI = `${window.location.origin}/app/integrations`;
 const GMAIL_TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
 
 // Keys for storing Gmail tokens in localStorage for background processing
@@ -52,20 +53,52 @@ const GMAIL_VALID_COLORS = [
   { backgroundColor: "#fbc8d9", textColor: "#000000" }
 ];
 
-// Category to label mapping with valid Gmail color palette values
-const CATEGORY_LABELS = {
-  '📦 Livraison / Suivi de commande': { name: '📦 Livraison / Suivi de commande', backgroundColor: "#4a86e8", textColor: "#ffffff" },
-  '❌ Annulation': { name: '❌ Annulation', backgroundColor: "#fb4c2f", textColor: "#ffffff" },
-  '💸 Remboursement': { name: '💸 Remboursement', backgroundColor: "#16a766", textColor: "#ffffff" },
-  '🔁 Retour': { name: '🔁 Retour', backgroundColor: "#ffad47", textColor: "#000000" },
-  '🛍 Avant-vente': { name: '🛍 Avant-vente', backgroundColor: "#a479e2", textColor: "#ffffff" },
-  '🔒 Résolu': { name: '🔒 Résolu', backgroundColor: "#43d692", textColor: "#000000" },
-  '🚫 Spam / à ignorer': { name: '🚫 Spam / à ignorer', backgroundColor: "#666666", textColor: "#ffffff" },
-  '🧾 Autres': { name: '🧾 Autres', backgroundColor: "#a4c2f4", textColor: "#000000" }
-};
+// Get category label translations
+const getTranslatedCategories = () => ({
+  [`📦 ${i18next.t('preferences.categories.delivery')}`]: { 
+    name: `📦 ${i18next.t('preferences.categories.delivery')}`, 
+    backgroundColor: "#4a86e8", 
+    textColor: "#ffffff" 
+  },
+  [`❌ ${i18next.t('preferences.categories.cancellation')}`]: { 
+    name: `❌ ${i18next.t('preferences.categories.cancellation')}`, 
+    backgroundColor: "#fb4c2f", 
+    textColor: "#ffffff" 
+  },
+  [`💸 ${i18next.t('preferences.categories.refund')}`]: { 
+    name: `💸 ${i18next.t('preferences.categories.refund')}`, 
+    backgroundColor: "#16a766", 
+    textColor: "#ffffff" 
+  },
+  [`🔁 ${i18next.t('preferences.categories.return')}`]: { 
+    name: `🔁 ${i18next.t('preferences.categories.return')}`, 
+    backgroundColor: "#ffad47", 
+    textColor: "#000000" 
+  },
+  [`🛍 ${i18next.t('preferences.categories.presale')}`]: { 
+    name: `🛍 ${i18next.t('preferences.categories.presale')}`, 
+    backgroundColor: "#a479e2", 
+    textColor: "#ffffff" 
+  },
+  [`🔒 ${i18next.t('preferences.categories.resolved')}`]: { 
+    name: `🔒 ${i18next.t('preferences.categories.resolved')}`, 
+    backgroundColor: "#43d692", 
+    textColor: "#000000" 
+  },
+  [`🚫 ${i18next.t('preferences.categories.spam')}`]: { 
+    name: `🚫 ${i18next.t('preferences.categories.spam')}`, 
+    backgroundColor: "#666666", 
+    textColor: "#ffffff" 
+  },
+  [`🧾 ${i18next.t('preferences.categories.other')}`]: { 
+    name: `🧾 ${i18next.t('preferences.categories.other')}`, 
+    backgroundColor: "#a4c2f4", 
+    textColor: "#000000" 
+  }
+});
 
 // Default fallback category
-const DEFAULT_CATEGORY = '🧾 Autres';
+const DEFAULT_CATEGORY = `🧾 ${i18next.t('preferences.categories.other')}`;
 
 // Interface for Gmail message
 interface GmailMessage {
@@ -187,11 +220,13 @@ export class GmailService {
   private labelsLoaded: boolean = false;
   private isRefreshing: boolean = false; // To prevent multiple simultaneous refresh attempts
   private userId?: string; // Track the user ID for token updates
-  
+  private CATEGORY_LABELS: ReturnType<typeof getTranslatedCategories>;
+
   constructor(accessToken: string, refreshToken?: string, userId?: string) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
     this.userId = userId;
+    this.CATEGORY_LABELS = getTranslatedCategories();
     
     // Store tokens for background processing
     if (accessToken) {
@@ -386,7 +421,7 @@ export class GmailService {
       const existingLabels = await this.getLabels();
       
       // Cache all labels by category
-      for (const [category, config] of Object.entries(CATEGORY_LABELS)) {
+      for (const [category, config] of Object.entries(this.CATEGORY_LABELS)) {
         if (!config || !config.name) continue;
         
         const existingLabel = existingLabels.find(label => 
@@ -547,7 +582,11 @@ export class GmailService {
       // Get existing labels first to avoid duplicates
       const existingLabels = await this.getLabels();
       
-      for (const [category, config] of Object.entries(CATEGORY_LABELS)) {
+      // Refresh category translations based on current language
+      this.CATEGORY_LABELS = getTranslatedCategories();
+      console.log(`createAllCategoryLabels: Using language: ${i18next.language}`);
+      
+      for (const [category, config] of Object.entries(this.CATEGORY_LABELS)) {
         if (!config || !config.name) continue;
         
         try {
@@ -596,14 +635,16 @@ export class GmailService {
   private findMatchingStandardCategory(categoryName: string): string {
     console.log(`findMatchingStandardCategory: Finding match for "${categoryName}"`);
     
+    const defaultCategory = `🧾 ${i18next.t('preferences.categories.other')}`;
+    
     // If it's already a standard category, return it as is
-    if (Object.keys(CATEGORY_LABELS).includes(categoryName)) {
+    if (Object.keys(this.CATEGORY_LABELS).includes(categoryName)) {
       console.log(`findMatchingStandardCategory: Direct match found`);
       return categoryName;
     }
     
     // Check for emojis that might help identify the category
-    for (const standardCategory of Object.keys(CATEGORY_LABELS)) {
+    for (const standardCategory of Object.keys(this.CATEGORY_LABELS)) {
       const emoji = standardCategory.split(' ')[0]; // Get emoji part
       if (categoryName.includes(emoji)) {
         console.log(`findMatchingStandardCategory: Matched by emoji to "${standardCategory}"`);
@@ -613,33 +654,27 @@ export class GmailService {
     
     // Look for keywords in the category name
     const lowerCategoryName = categoryName.toLowerCase();
-    
+    const currentLanguage = i18next.language;
+
     if (lowerCategoryName.includes('livraison') || lowerCategoryName.includes('delivery') || lowerCategoryName.includes('shipping')) {
-      console.log(`findMatchingStandardCategory: Matched by keyword to delivery`);
-      return '📦 Livraison / Suivi de commande';
+      return `📦 ${i18next.t('preferences.categories.delivery')}`;
     } else if (lowerCategoryName.includes('annulation') || lowerCategoryName.includes('cancel')) {
-      console.log(`findMatchingStandardCategory: Matched by keyword to cancellation`);
-      return '❌ Annulation';
+      return `❌ ${i18next.t('preferences.categories.cancellation')}`;
     } else if (lowerCategoryName.includes('remboursement') || lowerCategoryName.includes('refund')) {
-      console.log(`findMatchingStandardCategory: Matched by keyword to refund`);
-      return '💸 Remboursement';
+      return `💸 ${i18next.t('preferences.categories.refund')}`;
     } else if (lowerCategoryName.includes('retour') || lowerCategoryName.includes('return')) {
-      console.log(`findMatchingStandardCategory: Matched by keyword to return`);
-      return '🔁 Retour';
+      return `🔁 ${i18next.t('preferences.categories.return')}`;
     } else if (lowerCategoryName.includes('avant-vente') || lowerCategoryName.includes('presale') || lowerCategoryName.includes('question')) {
-      console.log(`findMatchingStandardCategory: Matched by keyword to presale`);
-      return '🛍 Avant-vente';
+      return `🛍 ${i18next.t('preferences.categories.presale')}`;
     } else if (lowerCategoryName.includes('resolu') || lowerCategoryName.includes('resolved')) {
-      console.log(`findMatchingStandardCategory: Matched by keyword to resolved`);
-      return '🔒 Résolu';
+      return `🔒 ${i18next.t('preferences.categories.resolved')}`;
     } else if (lowerCategoryName.includes('spam') || lowerCategoryName.includes('ignore')) {
-      console.log(`findMatchingStandardCategory: Matched by keyword to spam`);
-      return '🚫 Spam / à ignorer';
-    } 
+      return `🚫 ${i18next.t('preferences.categories.spam')}`;
+    }
     
     // Default fallback
     console.log(`findMatchingStandardCategory: No matches found, using default category`);
-    return DEFAULT_CATEGORY;
+    return defaultCategory;
   }
 
   // Get or create a label, with caching
@@ -680,12 +715,12 @@ export class GmailService {
       }
 
       // Look up the category config using the standard category
-      let labelConfig = CATEGORY_LABELS[standardCategory as keyof typeof CATEGORY_LABELS];
+      let labelConfig = this.CATEGORY_LABELS[standardCategory as keyof typeof this.CATEGORY_LABELS];
       
       // If no matching category is found (which should be rare now), create a custom label name safely
       if (!labelConfig) {
         console.warn(`No label config found for category: ${safeCategory}, using default config`);
-        labelConfig = CATEGORY_LABELS[DEFAULT_CATEGORY];
+        labelConfig = this.CATEGORY_LABELS[DEFAULT_CATEGORY];
       }
       
       if (!labelConfig.name) {
@@ -735,7 +770,7 @@ export class GmailService {
       
       // Get default label as a last resort
       try {
-        const defaultConfig = CATEGORY_LABELS[DEFAULT_CATEGORY];
+        const defaultConfig = this.CATEGORY_LABELS[DEFAULT_CATEGORY];
         if (!defaultConfig || !defaultConfig.name) {
           throw new Error('Default category configuration is invalid');
         }
@@ -965,7 +1000,7 @@ export class GmailService {
           );
 
           // Check if we should create a draft response
-          if (category !== '🚫 Spam / à ignorer' && userPreferences?.autoDraft !== false && activityId !== null) {
+          if (category !== `🚫 ${i18next.t('preferences.categories.spam')}` && userPreferences?.autoDraft !== false && activityId !== null) {
             try {
               // Check if we already have a draft for this message
               if (createdDrafts.has(message.id)) {
@@ -1030,7 +1065,7 @@ export class GmailService {
               // Continue processing even if draft creation fails
             }
           } else {
-            if (category === '🚫 Spam / à ignorer') {
+            if (category === `🚫 ${i18next.t('preferences.categories.spam')}`) {
               console.log(`processRecentEmails: Skipping draft creation for message ${message.id} (spam)`);
             } else if (userPreferences?.autoDraft === false) {
               console.log(`processRecentEmails: Skipping draft creation for message ${message.id} (autoDraft disabled)`);

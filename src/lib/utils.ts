@@ -1,5 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { format } from 'date-fns';
+import { fr, enUS } from 'date-fns/locale';
 
 // Combines classNames with Tailwind classes safely
 export function cn(...inputs: ClassValue[]) {
@@ -28,6 +30,18 @@ export function formatTimeAgo(date: Date): string {
   
   const diffYear = Math.floor(diffMonth / 12);
   return `${diffYear} year${diffYear !== 1 ? 's' : ''} ago`;
+}
+
+/**
+ * Format a date to a readable string using date-fns
+ */
+export function formatDate(date: Date | number | null | undefined, currentLanguage = 'fr'): string {
+  if (!date) return '';
+  
+  const dateObj = date instanceof Date ? date : new Date(date);
+  const locale = currentLanguage === 'fr' ? fr : enUS;
+  
+  return format(dateObj, 'PPp', { locale });
 }
 
 // Truncate text with ellipsis

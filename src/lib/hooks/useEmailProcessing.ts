@@ -6,6 +6,7 @@ import { OutlookService } from '../services/outlook';
 import { getUserIntegrations } from '../services/integrations';
 import toast from 'react-hot-toast';
 import { getStoredUserSession } from '../services/auth-persistence';
+import i18next from 'i18next';
 
 // Create a cache of processed messages to prevent duplicates within the same session
 const processedMessageIds = new Set<string>();
@@ -145,10 +146,11 @@ export function useEmailProcessing() {
         };
 
         // Check if we should create a draft
-        const shouldCreateDraft = category !== '🚫 Spam / à ignorer' && preferences.autoDraft !== false;
+        const spamCategory = `🚫 ${i18next.t('preferences.categories.spam')}`;
+        const shouldCreateDraft = category !== spamCategory && preferences.autoDraft !== false;
         console.log(`processEmail: Should create draft? ${shouldCreateDraft}`, {
           category,
-          isSpam: category === '🚫 Spam / à ignorer',
+          isSpam: category === spamCategory,
           autoDraftSetting: preferences.autoDraft
         });
 

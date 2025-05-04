@@ -9,8 +9,14 @@ import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/f
 import { db } from '../../lib/firebase';
 import { getUserIntegrations } from '../../lib/services/integrations';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 const DashboardPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  console.log('Current language:', i18n.language);
+  console.log('Welcome message translation:', t('dashboard.welcomeMessage'));
+  console.log('Active status translation:', t('common.active'));
+  
   const { userProfile, currentUser } = useAuth();
   const navigate = useNavigate();
   const isPro = userProfile?.plan === 'pro';
@@ -43,7 +49,7 @@ const DashboardPage: React.FC = () => {
         setLoading(false);
       }, (error) => {
         console.error('Error in emails listener:', error);
-        toast.error('Failed to get real-time email updates');
+        toast.error(t('dashboard.errors.emailUpdates', 'Failed to get real-time email updates'));
         setLoading(false);
       });
       
@@ -110,7 +116,7 @@ const DashboardPage: React.FC = () => {
 
     } catch (error) {
       console.error('Error setting up dashboard stats:', error);
-      toast.error('Failed to load dashboard statistics');
+      toast.error(t('dashboard.errors.statistics', 'Failed to load dashboard statistics'));
       setLoading(false);
     }
 
@@ -119,7 +125,7 @@ const DashboardPage: React.FC = () => {
       console.log('Cleaning up dashboard listeners');
       unsubscribers.forEach(unsubscribe => unsubscribe());
     };
-  }, [currentUser]);
+  }, [currentUser, t]);
 
   return (
     <div className="space-y-6">
@@ -128,23 +134,29 @@ const DashboardPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-              Welcome back, {userProfile?.name || 'User'}
+              {t('dashboard.welcome')}, {userProfile?.name || t('common.user', 'User')}
             </h2>
             <p className="mt-1 text-gray-600">
-              Your AI email assistant is {userProfile?.preferences?.autoClassify ? 'active' : 'inactive'}
+              {t('dashboard.welcomeMessage')}
+              {' '} {/* Espace explicite */}
+              <span className="font-medium">
+                {userProfile?.preferences?.autoClassify 
+                  ? t('common.active') 
+                  : t('common.inactive')}
+              </span>
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {/* {!isPro && (
               <Button onClick={() => navigate('/billing')}>
-                Upgrade to Pro
+                {t('dashboard.account.upgrade')}
               </Button>
             )} */}
             <Button 
               variant="outline"
-              onClick={() => navigate('/activity')}
+              onClick={() => navigate('/app/activity')}
             >
-              View active emails
+              {t('dashboard.quickActions.viewAll')}
             </Button>
           </div>
         </div>
@@ -154,7 +166,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Emails Processed</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">{t('dashboard.stats.emailsProcessed')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline justify-between">
@@ -174,7 +186,7 @@ const DashboardPage: React.FC = () => {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Drafts Generated</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">{t('dashboard.stats.autoResponses')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline justify-between">
@@ -194,7 +206,7 @@ const DashboardPage: React.FC = () => {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Avg. Response Time</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">{t('dashboard.stats.responseRate')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline justify-between">
@@ -214,7 +226,7 @@ const DashboardPage: React.FC = () => {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500">Active Integrations</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-500">{t('integrations.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-baseline justify-between">
@@ -236,7 +248,7 @@ const DashboardPage: React.FC = () => {
       {/* Setup checklist */}
       <Card>
         <CardHeader>
-          <CardTitle>Complete Your Setup</CardTitle>
+          <CardTitle>{t('dashboard.setup.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -248,17 +260,17 @@ const DashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">Connect your email account</h4>
-                  <p className="text-xs text-gray-500">Connect Gmail or Outlook to process emails</p>
+                  <h4 className="text-sm font-medium text-gray-900">{t('dashboard.setup.gmail.title')}</h4>
+                  <p className="text-xs text-gray-500">{t('dashboard.setup.gmail.description')}</p>
                 </div>
               </div>
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => navigate('/integrations')}
+                onClick={() => navigate('/app/integrations')}
                 rightIcon={<ArrowUpRight className="h-4 w-4" />}
               >
-                Connect
+                {t('common.connect')}
               </Button>
             </div>
 
@@ -270,17 +282,17 @@ const DashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">Connect Shopify store</h4>
-                  <p className="text-xs text-gray-500">Link your Shopify store to access order data</p>
+                  <h4 className="text-sm font-medium text-gray-900">{t('dashboard.setup.shopify.title')}</h4>
+                  <p className="text-xs text-gray-500">{t('dashboard.setup.shopify.description')}</p>
                 </div>
               </div>
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => navigate('/integrations')}
+                onClick={() => navigate('/app/integrations')}
                 rightIcon={<ArrowUpRight className="h-4 w-4" />}
               >
-                Connect
+                {t('common.connect')}
               </Button>
             </div>
 
@@ -292,17 +304,17 @@ const DashboardPage: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">Set up your preferences</h4>
-                  <p className="text-xs text-gray-500">Customize your email response settings</p>
+                  <h4 className="text-sm font-medium text-gray-900">{t('dashboard.setup.preferences.title')}</h4>
+                  <p className="text-xs text-gray-500">{t('dashboard.setup.preferences.description')}</p>
                 </div>
               </div>
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => navigate('/preferences')}
+                onClick={() => navigate('/app/preferences')}
                 rightIcon={<ArrowUpRight className="h-4 w-4" />}
               >
-                Configure
+                {t('common.configure')}
               </Button>
             </div>
           </div>

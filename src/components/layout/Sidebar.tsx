@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
+import logo from '../../assets/Logo EcomVA avec icône de boîtes.png';
 
 interface SidebarProps {
   onClose?: () => void;
@@ -19,14 +21,15 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const { userProfile } = useAuth();
+  const { t } = useTranslation();
 
   const navigation = [
-    { name: 'Dashboard', href: '/app/dashboard', icon: Home },
-    { name: 'Integrations', href: '/app/integrations', icon: Plug },
-    { name: 'Preferences', href: '/app/preferences', icon: SettingsIcon },
-    // { name: 'Billing', href: '/app/billing', icon: CreditCard },
-    { name: 'Activity Log', href: '/app/activity', icon: ClipboardList },
-    { name: 'Settings', href: '/app/settings', icon: Lock }
+    { name: t('sidebar.dashboard'), href: '/app/dashboard', icon: Home },
+    { name: t('sidebar.integrations'), href: '/app/integrations', icon: Plug },
+    { name: t('sidebar.preferences'), href: '/app/preferences', icon: SettingsIcon },
+    // { name: t('sidebar.billing'), href: '/app/billing', icon: CreditCard },
+    { name: t('sidebar.activityLog'), href: '/app/activity', icon: ClipboardList },
+    { name: t('sidebar.settings'), href: '/app/settings', icon: Lock }
   ];
 
   return (
@@ -36,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
         <button
           className="lg:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700"
           onClick={onClose}
-          aria-label="Close sidebar"
+          aria-label={t('common.closeSidebar')}
         >
           <X className="h-5 w-5" />
         </button>
@@ -45,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-gray-200">
         <div className="flex items-center space-x-2">
-          <Mail className="h-6 w-6 text-accent-500" />
+          <img src={logo} alt="EcomVA Logo" className="h-6 w-6" />
           <span className="text-xl font-semibold text-gray-900">EcomVA</span>
         </div>
       </div>
@@ -59,7 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-medium text-gray-900 truncate">
-                {userProfile.name || 'User'}
+                {userProfile.name || t('common.user')}
               </span>
               <span className="text-xs text-gray-500 truncate">
                 {userProfile.email}
@@ -68,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
           </div>
           <div className="mt-3">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-              {userProfile.plan === 'pro' ? 'Pro Plan' : 'Free Plan'}
+              {userProfile.plan === 'pro' ? t('sidebar.proPlan') : t('sidebar.freePlan')}
             </span>
           </div>
         </div>

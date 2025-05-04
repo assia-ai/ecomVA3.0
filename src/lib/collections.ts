@@ -20,6 +20,7 @@ export interface UserProfile {
     hiddenCategories: string[];
     responseTone: 'professional' | 'friendly' | 'formal';
     responseLength: 'concise' | 'balanced' | 'detailed';
+    language?: 'fr' | 'en'; // Ajout de la préférence de langue
   };
 }
 

@@ -12,6 +12,7 @@ import { auth, db } from '../lib/firebase';
 import type { UserProfile } from '../lib/collections';
 import { storeUserSession, clearUserSession, updateLastActive, getStoredUserSession } from '../lib/services/auth-persistence';
 import { GmailService, GMAIL_AUTH_ERROR_EVENT_NAME } from '../lib/services/gmail';
+import i18next from 'i18next';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -88,7 +89,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signature: '',
         hiddenCategories: [],
         responseTone: 'professional',
-        responseLength: 'balanced'
+        responseLength: 'balanced',
+        language: i18next.language || 'fr' // Ajout de la langue actuelle
       }
     });
     
@@ -131,6 +133,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (docSnap.exists()) {
       const profile = docSnap.data() as UserProfile;
       setUserProfile(profile);
+      
+      // Charger la langue préférée de l'utilisateur s'il en a une
+      if (profile.preferences?.language) {
+        i18next.changeLanguage(profile.preferences.language);
+        console.log(`Langue préférée chargée: ${profile.preferences.language}`);
+      }
+      
       return profile;
     } else {
       console.error('User profile not found in Firestore');
@@ -152,6 +161,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (docSnap.exists()) {
         const profile = docSnap.data() as UserProfile;
         setUserProfile(profile);
+        
+        // Mettre à jour la langue préférée si définie
+        if (profile.preferences?.language) {
+          i18next.changeLanguage(profile.preferences.language);
+          console.log(`Langue préférée mise à jour: ${profile.preferences.language}`);
+        }
+        
         return profile;
       } else {
         console.error('User profile not found during refresh');

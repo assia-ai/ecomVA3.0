@@ -1,0 +1,478 @@
+{
+    "common": {
+      "signIn": "Sign In",
+      "signUp": "Sign Up", 
+      "getStarted": "Get Started",
+      "startFreeTrial": "Free Trial",
+      "startTrial": "Start 14-Day Trial",
+      "login": "Log In",
+      "getStartedFree": "Get Started Free",
+      "cancel": "Cancel",
+      "save": "Save",
+      "loading": "Loading...",
+      "comingSoon": "Coming soon",
+      "connect": "Connect",
+      "configure": "Configure",
+      "user": "User",
+      "all": "All",
+      "active": "active",
+      "inactive": "inactive",
+      "notFound": "Page Not Found",
+      "backToHome": "Back to Home",
+      "errors": {
+        "generic": "An error occurred",
+        "notFound": "Resource not found",
+        "unauthorized": "Unauthorized",
+        "forbidden": "Access denied",
+        "validation": "Validation error"
+      }
+    },
+    "auth": {
+      "title": "Authentication",
+      "login": "Login",
+      "signup": "Sign Up",
+      "logout": "Logout",
+      "forgotPassword": "Forgot Password?",
+      "resetPassword": "Reset Password",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "name": "Name",
+      "errors": {
+        "invalidEmail": "Invalid email",
+        "invalidPassword": "Password must be at least 8 characters",
+        "passwordMismatch": "Passwords do not match",
+        "emailInUse": "Email already in use",
+        "wrongCredentials": "Invalid email or password",
+        "accountNotFound": "No account found with this email"
+      }
+    },
+    "navigation": {
+      "dashboard": "Dashboard",
+      "integrations": "Integrations",
+      "preferences": "Preferences",
+      "billing": "Billing",
+      "activityLog": "Activity Log",
+      "settings": "Settings"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "integrations": "Integrations",
+      "preferences": "Preferences",
+      "activityLog": "Activity Log",
+      "settings": "Settings",
+      "help": "Help",
+      "logout": "Logout",
+      "freePlan": "Free Plan",
+      "proPlan": "Pro Plan",
+      "upgrade": "Upgrade to Pro"
+    },
+    "landing": {
+      "hero": {
+        "title": "Automate Your Customer Service with AI",
+        "subtitle": "Automate customer email processing for your Shopify store with smart classification and AI-assisted responses."
+      },
+      "features": {
+        "title": "Everything You Need to Streamline Customer Communication",
+        "autoClassification": {
+          "title": "Auto-Classification",
+          "description": "Automatically categorize incoming emails into delivery tracking, returns, refunds, and more."
+        },
+        "aiGeneratedDrafts": {
+          "title": "AI-Generated Drafts",
+          "description": "Create automatic response drafts based on customer inquiries, ready for your review and sending."
+        },
+        "shopifyIntegration": {
+          "title": "Shopify Integration",
+          "description": "Connect your Shopify store to access order data and provide more accurate responses."
+        },
+        "gmailLabels": {
+          "title": "Gmail Labels",
+          "description": "Automatically organize emails with custom Gmail labels for better inbox management."
+        },
+        "timeSaving": {
+          "title": "Time Saving",
+          "description": "Save hours each week on customer service with automatic processing and response drafting."
+        },
+        "quickSetup": {
+          "title": "Quick Setup",
+          "description": "Get started in minutes with our simple onboarding process and guided setup wizard."
+        }
+      },
+      "howItWorks": {
+        "title": "How It Works",
+        "step1": {
+          "title": "Connect Your Accounts",
+          "description": "Integrate your Gmail account and Shopify store with just a few clicks.",
+          "point1": "Simple and quick setup",
+          "point2": "Secure access with limited permissions"
+        },
+        "step2": {
+          "title": "Automatic Classification",
+          "description": "AI analyzes and automatically classifies incoming emails.",
+          "point1": "Automatic detection of inquiry type",
+          "point2": "Organization by category with Gmail labels"
+        },
+        "step3": {
+          "title": "AI-Assisted Responses",
+          "description": "Save time with pre-drafted customizable responses.",
+          "point1": "Suggestions based on order data",
+          "point2": "Ready to send after your review"
+        }
+      },
+      "pricing": {
+        "title": "Simple, Transparent Pricing",
+        "freePlan": {
+          "title": "Free Plan",
+          "price": "$0",
+          "description": "Perfect for small merchants getting started with email automation.",
+          "feature1": "Process up to 100 emails/month",
+          "feature2": "Email classification",
+          "feature3": "Basic Gmail integration",
+          "feature4": "Community support"
+        },
+        "proPlan": {
+          "title": "Pro Plan",
+          "price": "$29",
+          "popular": "POPULAR",
+          "description": "For growing businesses that need comprehensive email management.",
+          "feature1": "Unlimited email processing",
+          "feature2": "Advanced AI response drafting",
+          "feature3": "Full Shopify integration",
+          "feature4": "Priority support",
+          "feature5": "Advanced analytics and reports"
+        }
+      },
+      "testimonials": {
+        "title": "Trusted by Shopify Merchants",
+        "testimonial1": {
+          "text": "EcomVA has allowed us to reduce our email handling time by 70%. Customer service is no longer a bottleneck for our growth.",
+          "name": "Sarah Johnson",
+          "company": "EcoStore"
+        },
+        "testimonial2": {
+          "text": "The auto-classification feature is impressive. Our team can now focus on cases that really need human attention.",
+          "name": "Michael Brown",
+          "company": "FashionFast"
+        }
+      },
+      "finalCTA": {
+        "title": "Ready to Transform Your Customer Email Management?",
+        "subtitle": "Join merchants who save hours every week with automated email processing.",
+        "note": "No credit card required for free trial."
+      }
+    },
+    "footer": {
+      "description": "Automate your customer service with AI for your Shopify store.",
+      "product": {
+        "title": "Product",
+        "features": "Features",
+        "pricing": "Pricing",
+        "integrations": "Integrations"
+      },
+      "support": {
+        "title": "Support",
+        "helpCenter": "Help Center",
+        "privacyPolicy": "Privacy Policy",
+        "termsOfService": "Terms of Service"
+      },
+      "contact": {
+        "title": "Contact",
+        "email": "support@ecomva.com"
+      },
+      "copyright": "All rights reserved"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Customize how ecomva processes your emails",
+      "saveSuccess": "Preferences saved successfully",
+      "saveError": "Failed to save preferences",
+      "automation": {
+        "title": "Automation Settings",
+        "description": "Control how emails are processed and drafted",
+        "autoClassify": {
+          "title": "Auto-classify",
+          "description": "Enable automatic classification of new emails",
+          "enable": "Enable auto-classification",
+          "disable": "Disable auto-classification"
+        },
+        "autoDraft": {
+          "title": "Auto-draft",
+          "description": "Automatically generate response drafts for new emails",
+          "enable": "Enable auto-drafting",
+          "disable": "Disable auto-drafting"
+        }
+      },
+      "signature": {
+        "title": "Email signature",
+        "description": "This signature will be added to your automated drafts",
+        "placeholder": "Your email signature...",
+        "note": "Use simple HTML for formatting"
+      },
+      "categories": {
+        "title": "Email Categories",
+        "description": "Hide or show categories in the interface",
+        "delivery": "Delivery / Order Tracking",
+        "cancellation": "Cancellation",
+        "refund": "Refund",
+        "return": "Return",
+        "presale": "Pre-sale",
+        "resolved": "Resolved",
+        "spam": "Spam / Ignore",
+        "other": "Others",
+        "show": "Show {{category}} category",
+        "hide": "Hide {{category}} category"
+      },
+      "saveButton": {
+        "default": "Save Preferences",
+        "saving": "Saving...",
+        "saved": "Preferences Saved"
+      }
+    },
+    "integrations": {
+      "title": "Integrations",
+      "description": "Connect your external accounts to access all features",
+      "loading": "Loading your integrations...",
+      "errors": {
+        "notLoggedIn": "You must be logged in to perform this action",
+        "fetchFailed": "Failed to load integrations"
+      },
+      "gmail": {
+        "title": "Gmail",
+        "description": "Connect your Gmail account to automate email management",
+        "connected": "Connected",
+        "notConnected": "Not connected",
+        "connect": "Connect Gmail",
+        "disconnect": "Disconnect",
+        "viewLabels": "View Labels",
+        "labels": "Gmail Labels",
+        "refreshLabels": "Refresh Labels",
+        "createLabels": "Create All Labels",
+        "closeModal": "Close",
+        "authProcessing": "Connecting to Gmail...",
+        "waitMessage": "Please wait while we process your Google authentication. Don't close this window.",
+        "permissions": {
+          "title": "Required Permissions",
+          "readEmails": "Read emails",
+          "sendEmails": "Send emails",
+          "manageLabels": "Manage labels",
+          "viewProfile": "View your profile"
+        },
+        "setup": {
+          "title": "Gmail Setup",
+          "step1": "1. Sign in with Google",
+          "step2": "2. Allow permissions",
+          "step3": "3. Configure labels",
+          "complete": "Setup complete"
+        },
+        "errorExpired": "Your Gmail connection has expired. Please reconnect your account.",
+        "connectError": "Failed to connect Gmail account",
+        "connectSuccess": "Connected Gmail account: {{email}}",
+        "reconnect": "Reconnect",
+        "connectGoogle": "Connect your Google account",
+        "labelDescription": "Use Gmail labels to organize your emails by category.",
+        "loadingLabels": "Loading...",
+        "labelError": "Unable to retrieve labels",
+        "noIntegration": "No Gmail integration found. Please connect your Gmail account.",
+        "labelsCreated": "Category labels created in Gmail",
+        "labelsError": "Failed to create Gmail labels. Please try again."
+      },
+      "outlook": {
+        "connectMicrosoft": "Connect your Microsoft account",
+        "connected": "Connected",
+        "disconnect": "Disconnect",
+        "connect": "Connect Outlook",
+        "connectSuccess": "Outlook connected successfully",
+        "disconnectSuccess": "Outlook disconnected"
+      },
+      "shopify": {
+        "title": "Shopify",
+        "description": "Connect your Shopify store to access order data",
+        "storeUrl": "Store URL",
+        "apiToken": "API Token",
+        "connect": "Connect Shopify",
+        "disconnect": "Disconnect",
+        "connected": "Connected",
+        "notConnected": "Not connected",
+        "howToFind": "How to find your API token?",
+        "instructions": {
+          "title": "Instructions",
+          "step1": "1. Log in to your Shopify admin",
+          "step2": "2. Go to Settings > Apps",
+          "step3": "3. Create a private app",
+          "step4": "4. Copy the API token"
+        },
+        "errorMissingFields": "Please enter both Shopify URL and access token",
+        "connectSuccess": "Shopify store connected successfully",
+        "disconnectSuccess": "Shopify store disconnected",
+        "disconnectError": "Failed to disconnect Shopify store",
+        "connectedDescription": "Your store is connected and we can access order data."
+      },
+      "permissions": {
+        "title": "Required Permissions",
+        "description": "To function properly, this app needs access to your emails and store data. We only store the necessary metadata."
+      }
+    },
+    "settings": {
+      "title": "Account Settings",
+      "description": "Manage your personal information and security settings",
+      "profile": {
+        "title": "Profile",
+        "description": "Update your personal information",
+        "name": "Full Name",
+        "email": "Email Address",
+        "updateProfile": "Update Profile",
+        "profileUpdated": "Profile updated"
+      },
+      "password": {
+        "title": "Password",
+        "description": "Update your password",
+        "current": "Current Password",
+        "new": "New Password",
+        "confirm": "Confirm Password",
+        "updatePassword": "Update Password",
+        "passwordUpdated": "Password updated",
+        "passwordMismatch": "Passwords do not match"
+      },
+      "account": {
+        "title": "Account",
+        "description": "Manage your subscription and account settings",
+        "plan": "Your Plan",
+        "freePlan": "Free Plan",
+        "proPlan": "Pro Plan",
+        "upgrade": "Upgrade to Pro",
+        "billing": "Billing",
+        "manageBilling": "Manage Billing",
+        "deleteAccount": "Delete Account",
+        "deleteWarning": "This action is irreversible. All of your data will be permanently deleted."
+      },
+      "twoFactor": {
+        "title": "Two-Factor Authentication",
+        "description": "Add an extra layer of security to your account",
+        "enable": "Enable Two-Factor Authentication",
+        "disable": "Disable Two-Factor Authentication",
+        "scanQr": "Scan this QR code with your authentication app",
+        "enterCode": "Enter 6-digit code",
+        "verifyCode": "Verify Code",
+        "backup": "Backup Codes",
+        "backupDescription": "Keep these codes in a safe place in case you lose access to your authentication device"
+      }
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Welcome to EcomVA",
+      "welcomeMessage": "Manage your customer emails efficiently with AI assistance",
+      "stats": {
+      "emailsProcessed": "Emails processed",
+      "autoResponses": "Auto responses",
+      "categories": "Categories",
+      "responseRate": "Response rate",
+      "today": "today",
+      "thisWeek": "this week",
+      "thisMonth": "this month",
+      "allTime": "total"
+      },
+      "recentActivity": {
+      "title": "Recent activity",
+      "viewAll": "View all",
+      "noActivity": "No recent activity",
+      "emailProcessed": "Email processed",
+      "responseGenerated": "Response generated",
+      "emailCategorized": "Email categorized"
+      },
+      "setup": {
+      "title": "Complete your setup",
+      "gmail": {
+        "title": "Connect your Gmail account",
+        "description": "Integrate your mailbox to automate email processing"
+      },
+      "shopify": {
+        "title": "Connect your Shopify store",
+        "description": "Access order data for more accurate responses"
+      },
+      "preferences": {
+        "title": "Configure your preferences",
+        "description": "Customize your email response settings"
+      }
+      },
+      "quickActions": {
+      "title": "Quick actions",
+      "processNew": "Process new emails",
+      "viewAll": "View all emails",
+      "settings": "Settings"
+      }
+    },
+    "activity": {
+      "title": "Activity Log",
+      "description": "Track and monitor processed emails",
+      "filters": "Filters",
+      "categoryLabel": "Category",
+      "categories": "Categories",
+      "search": "Search emails...",
+      "filter": "Filter",
+      "clearFilters": "Clear Filters",
+      "allCategories": "All Categories",
+      "allStatuses": "All Statuses",
+      "emailActivity": "Email Activity",
+      "loadingActivities": "Loading activities...",
+      "emailsProcessed": "{count} {count, plural, one {email} other {emails}} processed",
+      "dateRange": {
+        "label": "Date Range",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "lastWeek": "Last 7 days",
+        "lastMonth": "Last 30 days",
+        "custom": "Custom"
+      },
+      "search": "Search",
+      "from": "From",
+      "noFilterResults": "No results found with the selected filters",
+      "noResults": "No processed emails found",
+      "noEmailsProcessed": "No emails processed yet",
+      "processEmailsDescription": "Click \"Fetch New Emails\" to process your inbox, or wait for the automatic processing to run.",
+      "fetchNewEmails": "Fetch New Emails",
+      "noEmailAccounts": "No email accounts connected",
+      "needConnectionDescription": "You need to connect an email account before emails can be processed.",
+      "connectEmailAccount": "Connect Email Account",
+      "table": {
+        "email": "Email",
+        "subject": "Subject",
+        "category": "Category",
+        "date": "Date",
+        "status": "Status",
+        "actions": "Actions",
+        "view": "View",
+        "delete": "Delete"
+      },
+      "status": {
+        "classified": "Classified",
+        "draft_created": "Draft Created",
+        "processed": "Processed",
+        "failed": "Failed",
+        "ignored": "Ignored"
+      },
+      "statusOptions": {
+        "classified": "Classified Only",
+        "draft_created": "Draft Created",
+        "processed": "Fully Processed"
+      },
+      "viewDraft": "View Draft",
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next",
+        "of": "of",
+        "showing": "Showing",
+        "to": "to",
+        "results": "results"
+      },
+      "errorMessages": {
+        "fetchFailed": "Failed to load activities",
+        "processFailed": "Failed to process activities",
+        "refreshFailed": "Failed to refresh emails"
+      },
+      "refreshSuccess": "Emails refreshed successfully"
+    },
+    "success": {
+      "emailsRefreshed": "Emails refreshed successfully"
+    }
+  }

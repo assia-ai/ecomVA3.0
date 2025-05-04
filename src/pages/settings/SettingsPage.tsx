@@ -8,9 +8,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { getAuth, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { useTranslation } from 'react-i18next';
 
 const SettingsPage: React.FC = () => {
   const { userProfile, currentUser, refreshUserProfile } = useAuth();
+  const { t } = useTranslation();
   
   // Profile settings state
   const [name, setName] = useState(userProfile?.name || '');
@@ -30,12 +32,12 @@ const SettingsPage: React.FC = () => {
   // Save profile handler
   const handleSaveProfile = async () => {
     if (!name.trim()) {
-      toast.error('Name is required');
+      toast.error(t('settings.profile.nameRequired'));
       return;
     }
     
     if (!currentUser) {
-      toast.error('You must be logged in to update your profile');
+      toast.error(t('common.errors.notLoggedIn'));
       return;
     }
     
@@ -52,10 +54,10 @@ const SettingsPage: React.FC = () => {
       // Refresh the user profile in AuthContext
       await refreshUserProfile(currentUser.uid);
       
-      toast.success('Profile updated successfully');
+      toast.success(t('settings.profile.profileUpdated'));
     } catch (error) {
       console.error('Failed to update profile:', error);
-      toast.error('Failed to update profile');
+      toast.error(t('settings.profile.updateError'));
     } finally {
       setSavingProfile(false);
     }
@@ -64,27 +66,27 @@ const SettingsPage: React.FC = () => {
   // Change password handler
   const handleChangePassword = async () => {
     if (!currentPassword) {
-      toast.error('Current password is required');
+      toast.error(t('settings.password.currentRequired'));
       return;
     }
     
     if (!newPassword) {
-      toast.error('New password is required');
+      toast.error(t('settings.password.newRequired'));
       return;
     }
     
     if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error(t('settings.password.passwordMismatch'));
       return;
     }
     
     if (newPassword.length < 8) {
-      toast.error('New password must be at least 8 characters');
+      toast.error(t('settings.password.tooShort'));
       return;
     }
     
     if (!currentUser) {
-      toast.error('You must be logged in to change your password');
+      toast.error(t('common.errors.notLoggedIn'));
       return;
     }
     
@@ -116,19 +118,19 @@ const SettingsPage: React.FC = () => {
       setNewPassword('');
       setConfirmPassword('');
       
-      toast.success('Password updated successfully');
+      toast.success(t('settings.password.passwordUpdated'));
     } catch (error: any) {
       console.error('Failed to update password:', error);
       
       // Handle specific error cases
       if (error.code === 'auth/wrong-password') {
-        toast.error('Current password is incorrect');
+        toast.error(t('settings.password.wrongPassword'));
       } else if (error.code === 'auth/weak-password') {
-        toast.error('Password is too weak. Choose a stronger password');
+        toast.error(t('settings.password.weakPassword'));
       } else if (error.code === 'auth/requires-recent-login') {
-        toast.error('This operation requires a recent login. Please log out and log in again before retrying');
+        toast.error(t('settings.password.requiresRecentLogin'));
       } else {
-        toast.error('Failed to update password: ' + (error.message || 'Unknown error'));
+        toast.error(t('settings.password.updateError') + ': ' + (error.message || t('common.errors.generic')));
       }
     } finally {
       setSavingPassword(false);
@@ -138,7 +140,7 @@ const SettingsPage: React.FC = () => {
   // Delete account handler
   const handleDeleteAccount = () => {
     if (deleteConfirmation !== userProfile?.email) {
-      toast.error('Email confirmation does not match');
+      toast.error(t('settings.account.emailMismatch'));
       return;
     }
     
@@ -148,7 +150,7 @@ const SettingsPage: React.FC = () => {
     setTimeout(() => {
       // In a real app, this would delete the user's account from Firebase Auth and Firestore
       setIsDeleting(false);
-      toast.success('Account deleted successfully');
+      toast.success(t('settings.account.deleteSuccess'));
       // In a real app, this would redirect to login page
     }, 1500);
   };
@@ -156,8 +158,8 @@ const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
-        <h2 className="text-xl font-semibold text-gray-900">Account Settings</h2>
-        <p className="text-gray-600">Manage your account details and security</p>
+        <h2 className="text-xl font-semibold text-gray-900">{t('settings.title')}</h2>
+        <p className="text-gray-600">{t('settings.description')}</p>
       </div>
       
       {/* Profile Settings */}
@@ -168,20 +170,20 @@ const SettingsPage: React.FC = () => {
               <User className="h-5 w-5 text-primary-600" />
             </div>
             <div>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your account details</CardDescription>
+              <CardTitle>{t('settings.profile.title')}</CardTitle>
+              <CardDescription>{t('settings.profile.description')}</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <Input
-            label="Name"
+            label={t('settings.profile.name')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             fullWidth
           />
           <Input
-            label="Email Address"
+            label={t('settings.profile.email')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             type="email"
@@ -189,7 +191,7 @@ const SettingsPage: React.FC = () => {
             fullWidth
           />
           <p className="text-xs text-gray-500">
-            Email address cannot be changed. Contact support if you need to update your email.
+            {t('settings.profile.emailHint')}
           </p>
         </CardContent>
         <CardFooter className="flex justify-end">
@@ -197,7 +199,7 @@ const SettingsPage: React.FC = () => {
             onClick={handleSaveProfile}
             isLoading={savingProfile}
           >
-            Save Changes
+            {t('settings.profile.updateProfile')}
           </Button>
         </CardFooter>
       </Card>
@@ -210,29 +212,29 @@ const SettingsPage: React.FC = () => {
               <Key className="h-5 w-5 text-secondary-600" />
             </div>
             <div>
-              <CardTitle>Change Password</CardTitle>
-              <CardDescription>Update your account password</CardDescription>
+              <CardTitle>{t('settings.password.title')}</CardTitle>
+              <CardDescription>{t('settings.password.description')}</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <Input
-            label="Current Password"
+            label={t('settings.password.current')}
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             type="password"
             fullWidth
           />
           <Input
-            label="New Password"
+            label={t('settings.password.new')}
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             type="password"
-            helperText="Password must be at least 8 characters"
+            helperText={t('settings.password.passwordHint')}
             fullWidth
           />
           <Input
-            label="Confirm New Password"
+            label={t('settings.password.confirm')}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             type="password"
@@ -244,7 +246,7 @@ const SettingsPage: React.FC = () => {
             onClick={handleChangePassword}
             isLoading={savingPassword}
           >
-            Update Password
+            {t('settings.password.updatePassword')}
           </Button>
         </CardFooter>
       </Card>
@@ -257,8 +259,8 @@ const SettingsPage: React.FC = () => {
               <Shield className="h-5 w-5 text-accent-600" />
             </div>
             <div>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Manage account security and permissions</CardDescription>
+              <CardTitle>{t('settings.twoFactor.title')}</CardTitle>
+              <CardDescription>{t('settings.twoFactor.description')}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -267,12 +269,12 @@ const SettingsPage: React.FC = () => {
             <div className="flex items-center space-x-3">
               <Mail className="h-5 w-5 text-gray-400 flex-shrink-0" />
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Two-Factor Authentication</h4>
-                <p className="text-xs text-gray-500">Add an extra layer of security to your account</p>
+                <h4 className="text-sm font-medium text-gray-900">{t('settings.twoFactor.enable')}</h4>
+                <p className="text-xs text-gray-500">{t('settings.twoFactor.description')}</p>
               </div>
             </div>
             <div className="flex items-center">
-              <span className="mr-3 text-xs font-medium text-gray-500">Coming soon</span>
+              <span className="mr-3 text-xs font-medium text-gray-500">{t('common.comingSoon')}</span>
               <button
                 type="button"
                 className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-not-allowed rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none"
@@ -287,12 +289,12 @@ const SettingsPage: React.FC = () => {
             <div className="flex items-center space-x-3">
               <Shield className="h-5 w-5 text-gray-400 flex-shrink-0" />
               <div>
-                <h4 className="text-sm font-medium text-gray-900">Session Management</h4>
-                <p className="text-xs text-gray-500">View and manage your active sessions</p>
+                <h4 className="text-sm font-medium text-gray-900">{t('settings.security.sessionManagement')}</h4>
+                <p className="text-xs text-gray-500">{t('settings.security.sessionDesc')}</p>
               </div>
             </div>
             <Button variant="outline" size="sm" disabled>
-              View Sessions
+              {t('settings.security.viewSessions')}
             </Button>
           </div>
         </CardContent>
@@ -306,8 +308,8 @@ const SettingsPage: React.FC = () => {
               <Trash2 className="h-5 w-5 text-error-600" />
             </div>
             <div>
-              <CardTitle className="text-error-700">Delete Account</CardTitle>
-              <CardDescription>Permanently delete your account and all data</CardDescription>
+              <CardTitle className="text-error-700">{t('settings.account.deleteAccount')}</CardTitle>
+              <CardDescription>{t('settings.account.deleteDescription')}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -315,16 +317,15 @@ const SettingsPage: React.FC = () => {
           <div className="flex items-start p-4 bg-error-50 rounded-md">
             <AlertTriangle className="h-5 w-5 text-error-600 mr-3 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="text-sm font-medium text-error-800">Warning: This action cannot be undone</h4>
+              <h4 className="text-sm font-medium text-error-800">{t('settings.account.deleteWarning')}</h4>
               <p className="mt-1 text-xs text-error-700">
-                Deleting your account will remove all your data, including email settings, integrations, and preferences. 
-                This action is permanent and cannot be recovered.
+                {t('settings.account.deleteExplanation')}
               </p>
             </div>
           </div>
           
           <Input
-            label="Type your email to confirm"
+            label={t('settings.account.typeEmail')}
             value={deleteConfirmation}
             onChange={(e) => setDeleteConfirmation(e.target.value)}
             placeholder={userProfile?.email}
@@ -338,7 +339,7 @@ const SettingsPage: React.FC = () => {
             isLoading={isDeleting}
             disabled={deleteConfirmation !== userProfile?.email}
           >
-            Delete Account
+            {t('settings.account.deleteAccount')}
           </Button>
         </CardFooter>
       </Card>
