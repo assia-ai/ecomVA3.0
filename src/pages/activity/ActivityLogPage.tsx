@@ -313,9 +313,9 @@ const ActivityLogPage: React.FC = () => {
                 <CardDescription>{t('activity.loadingActivities')}</CardDescription>
               ) : (
                 <CardDescription>
-                  {t('activity.emailsProcessed', { 
-                    count: filteredActivities.length,
-                  })}
+                  {filteredActivities.length} {filteredActivities.length === 1 ? 
+                    t('activity.singleEmailProcessed') : 
+                    t('activity.multipleEmailsProcessed')}
                 </CardDescription>
               )}
             </div>

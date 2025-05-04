@@ -415,7 +415,9 @@
       "allStatuses": "All Statuses",
       "emailActivity": "Email Activity",
       "loadingActivities": "Loading activities...",
-      "emailsProcessed": "{count} {count, plural, one {email} other {emails}} processed",
+      "emailsProcessed": "{{count}} {{count, plural, one {email} other {emails}}} processed",
+      "singleEmailProcessed": "email processed",
+      "multipleEmailsProcessed": "emails processed",
       "dateRange": {
         "label": "Date Range",
         "today": "Today",
