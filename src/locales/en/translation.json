@@ -68,6 +68,14 @@
       "upgrade": "Upgrade to Pro"
     },
     "landing": {
+      "nav": {
+        "features": "Features",
+        "howItWorks": "How it Works",
+        "pricing": "Pricing",
+        "testimonials": "Testimonials",
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy"
+      },
       "hero": {
         "title": "Automate Your Customer Service with AI",
         "subtitle": "Automate customer email processing for your Shopify store with smart classification and AI-assisted responses."

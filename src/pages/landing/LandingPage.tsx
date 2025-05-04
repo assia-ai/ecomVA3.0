@@ -16,11 +16,21 @@ const LandingPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Navigation */}
-      <nav className="px-4 md:px-6 py-4 flex items-center justify-between border-b border-gray-200">
+      <nav className="px-4 md:px-6 py-4 flex flex-col md:flex-row items-center justify-between border-b border-gray-200">
         <div className="flex items-center space-x-2">
           <img src={logo} alt="EcomVA Logo" className="h-8 w-auto" />
           <span className="text-xl font-semibold text-gray-900">EcomVA</span>
         </div>
+        
+        {/* Menu principal */}
+        <div className="flex flex-wrap justify-center my-3 md:my-0">
+          <ul className="flex space-x-2 md:space-x-8 text-sm md:text-base">
+            <li><a href="#features" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">{t('landing.nav.features')}</a></li>
+            <li><a href="#how-it-works" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">{t('landing.nav.howItWorks')}</a></li>
+            <li><a href="#pricing" className="text-gray-600 hover:text-primary-600 font-medium transition-colors">{t('landing.nav.pricing')}</a></li>
+          </ul>
+        </div>
+        
         <div className="flex items-center space-x-4">
           {/* Language Selector */}
           <div className="flex items-center gap-2 text-sm">
@@ -86,7 +96,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-gray-50 px-6">
+      <section id="features" className="py-16 bg-gray-50 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-12 text-center">
             {t('landing.features.title')}
@@ -157,7 +167,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 px-6">
+      <section id="how-it-works" className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-12 text-center">
             {t('landing.howItWorks.title')}
@@ -240,7 +250,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-16 bg-gray-50 px-6">
+      <section id="pricing" className="py-16 bg-gray-50 px-6">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-12 text-center">
             {t('landing.pricing.title')}
@@ -319,7 +329,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 px-6">
+      <section id="testimonials" className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-12 text-center">
             {t('landing.testimonials.title')}

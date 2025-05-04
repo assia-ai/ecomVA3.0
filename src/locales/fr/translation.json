@@ -48,6 +48,14 @@
       "upgrade": "Passer au Pro"
     },
     "landing": {
+      "nav": {
+        "features": "Fonctionnalités",
+        "howItWorks": "Comment ça marche",
+        "pricing": "Tarification",
+        "testimonials": "Témoignages",
+        "terms": "Conditions d'utilisation",
+        "privacy": "Politique de confidentialité"
+      },
       "hero": {
         "title": "Gérez votre service client automatiquement avec IA",
         "subtitle": "Automatisez le traitement des emails client pour votre boutique Shopify avec une classification intelligente et des réponses pré-rédigées."
