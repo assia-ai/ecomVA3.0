@@ -381,43 +381,45 @@
       "welcome": "Welcome to EcomVA",
       "welcomeMessage": "Manage your customer emails efficiently with AI assistance",
       "stats": {
-      "emailsProcessed": "Emails processed",
-      "autoResponses": "Auto responses",
-      "categories": "Categories",
-      "responseRate": "Response rate",
-      "today": "today",
-      "thisWeek": "this week",
-      "thisMonth": "this month",
-      "allTime": "total"
+        "emailsProcessed": "Emails processed",
+        "autoResponses": "Auto responses",
+        "categories": "Categories",
+        "responseRate": "Response rate",
+        "today": "today",
+        "thisWeek": "this week",
+        "thisMonth": "this month",
+        "allTime": "total"
       },
       "recentActivity": {
-      "title": "Recent activity",
-      "viewAll": "View all",
-      "noActivity": "No recent activity",
-      "emailProcessed": "Email processed",
-      "responseGenerated": "Response generated",
-      "emailCategorized": "Email categorized"
+        "title": "Recent activity",
+        "viewAll": "View all",
+        "noActivity": "No recent activity",
+        "emailProcessed": "Email processed",
+        "responseGenerated": "Response generated",
+        "emailCategorized": "Email categorized"
       },
       "setup": {
-      "title": "Complete your setup",
-      "gmail": {
-        "title": "Connect your Gmail account",
-        "description": "Integrate your mailbox to automate email processing"
-      },
-      "shopify": {
-        "title": "Connect your Shopify store",
-        "description": "Access order data for more accurate responses"
-      },
-      "preferences": {
-        "title": "Configure your preferences",
-        "description": "Customize your email response settings"
-      }
+        "title": "Complete your setup",
+        "completed": "Completed",
+        "configured": "Configured",
+        "gmail": {
+          "title": "Connect your Gmail account",
+          "description": "Integrate your mailbox to automate email processing"
+        },
+        "shopify": {
+          "title": "Connect your Shopify store",
+          "description": "Access order data for more accurate responses"
+        },
+        "preferences": {
+          "title": "Configure your preferences",
+          "description": "Customize your email response settings"
+        }
       },
       "quickActions": {
-      "title": "Quick actions",
-      "processNew": "Process new emails",
-      "viewAll": "View all emails",
-      "settings": "Settings"
+        "title": "Quick actions",
+        "processNew": "Process new emails",
+        "viewAll": "View all emails",
+        "settings": "Settings"
       }
     },
     "activity": {

@@ -380,6 +380,8 @@
       },
       "setup": {
         "title": "Complétez votre configuration",
+        "completed": "Complété",
+        "configured": "Configuré",
         "gmail": {
           "title": "Connectez votre compte Gmail",
           "description": "Intégrez votre boîte mail pour automatiser le traitement des emails"

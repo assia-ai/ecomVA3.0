@@ -27,6 +27,11 @@ const DashboardPage: React.FC = () => {
   const [averageResponseTime, setAverageResponseTime] = useState<string>('0 min');
   const [activeIntegrations, setActiveIntegrations] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  
+  // States for setup completion tracking
+  const [isGmailConfigured, setIsGmailConfigured] = useState<boolean>(false);
+  const [isShopifyConfigured, setIsShopifyConfigured] = useState<boolean>(false);
+  const [isPreferencesConfigured, setIsPreferencesConfigured] = useState<boolean>(false);
 
   // Fetch dashboard statistics in real-time
   useEffect(() => {
@@ -126,6 +131,36 @@ const DashboardPage: React.FC = () => {
       unsubscribers.forEach(unsubscribe => unsubscribe());
     };
   }, [currentUser, t]);
+
+  // Check which setup steps are completed
+  useEffect(() => {
+    if (!currentUser || !userProfile) return;
+
+    // Check if Gmail is configured
+    const checkGmailConfig = async () => {
+      try {
+        const integrations = await getUserIntegrations(currentUser.uid);
+        const gmailIntegration = integrations.find(integration => integration.type === 'gmail');
+        setIsGmailConfigured(!!gmailIntegration);
+        
+        // Check if Shopify is configured
+        const shopifyIntegration = integrations.find(integration => integration.type === 'shopify');
+        setIsShopifyConfigured(!!shopifyIntegration);
+      } catch (error) {
+        console.error('Error checking integrations:', error);
+      }
+    };
+    
+    // Check if preferences are configured
+    const hasPreferences = userProfile?.preferences && 
+      (userProfile.preferences.autoClassify !== undefined || 
+       userProfile.preferences.autoDraft !== undefined ||
+       userProfile.preferences.signature);
+    
+    setIsPreferencesConfigured(!!hasPreferences);
+    checkGmailConfig();
+    
+  }, [currentUser, userProfile]);
 
   return (
     <div className="space-y-6">
@@ -252,69 +287,90 @@ const DashboardPage: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+            <div className={`flex items-center justify-between p-3 rounded-md ${isGmailConfigured ? 'bg-green-50 border border-green-100' : 'bg-gray-50'}`}>
               <div className="flex items-center">
                 <div className="flex-shrink-0 mr-3">
-                  <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center">
-                    <Mail className="h-4 w-4 text-primary-600" />
+                  <div className={`h-8 w-8 rounded-full ${isGmailConfigured ? 'bg-green-100' : 'bg-primary-100'} flex items-center justify-center`}>
+                    <Mail className={`h-4 w-4 ${isGmailConfigured ? 'text-green-600' : 'text-primary-600'}`} />
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">{t('dashboard.setup.gmail.title')}</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-medium text-gray-900">{t('dashboard.setup.gmail.title')}</h4>
+                    {isGmailConfigured && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {t('dashboard.setup.completed')}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500">{t('dashboard.setup.gmail.description')}</p>
                 </div>
               </div>
               <Button 
-                variant="outline" 
+                variant={isGmailConfigured ? "success" : "outline"}
                 size="sm"
                 onClick={() => navigate('/app/integrations')}
-                rightIcon={<ArrowUpRight className="h-4 w-4" />}
+                rightIcon={isGmailConfigured ? <CheckCircle className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
               >
-                {t('common.connect')}
+                {isGmailConfigured ? t('dashboard.setup.configured') : t('common.connect')}
               </Button>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+            <div className={`flex items-center justify-between p-3 rounded-md ${isShopifyConfigured ? 'bg-green-50 border border-green-100' : 'bg-gray-50'}`}>
               <div className="flex items-center">
                 <div className="flex-shrink-0 mr-3">
-                  <div className="h-8 w-8 rounded-full bg-secondary-100 flex items-center justify-center">
-                    <ShoppingCart className="h-4 w-4 text-secondary-600" />
+                  <div className={`h-8 w-8 rounded-full ${isShopifyConfigured ? 'bg-green-100' : 'bg-secondary-100'} flex items-center justify-center`}>
+                    <ShoppingCart className={`h-4 w-4 ${isShopifyConfigured ? 'text-green-600' : 'text-secondary-600'}`} />
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">{t('dashboard.setup.shopify.title')}</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-medium text-gray-900">{t('dashboard.setup.shopify.title')}</h4>
+                    {isShopifyConfigured && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {t('dashboard.setup.completed')}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500">{t('dashboard.setup.shopify.description')}</p>
                 </div>
               </div>
               <Button 
-                variant="outline" 
+                variant={isShopifyConfigured ? "success" : "outline"}
                 size="sm"
                 onClick={() => navigate('/app/integrations')}
-                rightIcon={<ArrowUpRight className="h-4 w-4" />}
+                rightIcon={isShopifyConfigured ? <CheckCircle className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
               >
-                {t('common.connect')}
+                {isShopifyConfigured ? t('dashboard.setup.configured') : t('common.connect')}
               </Button>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
+            <div className={`flex items-center justify-between p-3 rounded-md ${isPreferencesConfigured ? 'bg-green-50 border border-green-100' : 'bg-gray-50'}`}>
               <div className="flex items-center">
                 <div className="flex-shrink-0 mr-3">
-                  <div className="h-8 w-8 rounded-full bg-success-100 flex items-center justify-center">
-                    <CheckCircle className="h-4 w-4 text-success-600" />
+                  <div className={`h-8 w-8 rounded-full ${isPreferencesConfigured ? 'bg-green-100' : 'bg-success-100'} flex items-center justify-center`}>
+                    <CheckCircle className={`h-4 w-4 ${isPreferencesConfigured ? 'text-green-600' : 'text-success-600'}`} />
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">{t('dashboard.setup.preferences.title')}</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-medium text-gray-900">{t('dashboard.setup.preferences.title')}</h4>
+                    {isPreferencesConfigured && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {t('dashboard.setup.completed')}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500">{t('dashboard.setup.preferences.description')}</p>
                 </div>
               </div>
               <Button 
-                variant="outline" 
+                variant={isPreferencesConfigured ? "success" : "outline"}
                 size="sm"
                 onClick={() => navigate('/app/preferences')}
-                rightIcon={<ArrowUpRight className="h-4 w-4" />}
+                rightIcon={isPreferencesConfigured ? <CheckCircle className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
               >
-                {t('common.configure')}
+                {isPreferencesConfigured ? t('dashboard.setup.configured') : t('common.configure')}
               </Button>
             </div>
           </div>
