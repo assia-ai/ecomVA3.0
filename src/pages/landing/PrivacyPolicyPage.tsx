@@ -18,7 +18,7 @@ const PrivacyPolicyPage: React.FC = () => {
     fr: (
       <>
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Politique de confidentialité – EcomVA</h1>
-        <p className="text-gray-500 mb-8">Dernière mise à jour : 02/05/2025</p>
+        <p className="text-gray-500 mb-8">Dernière mise à jour : 05/05/2025</p>
         
         <h2 className="text-2xl font-semibold text-gray-900 mt-8">1. Qui sommes-nous ?</h2>
         <p>
@@ -45,22 +45,31 @@ const PrivacyPolicyPage: React.FC = () => {
           <li>Afficher un historique dans votre tableau de bord</li>
         </ul>
         
-        <h2 className="text-2xl font-semibold text-gray-900 mt-8">4. Où et combien de temps sont stockées vos données ?</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">4. Utilisation des données Gmail</h2>
+        <p>
+          EcomVA utilise les API Gmail pour automatiser la gestion des courriels client (lecture, étiquetage, réponse, brouillons).
+          Nous ne stockons pas les contenus des e-mails de façon permanente et nous n'utilisons en aucun cas les données des utilisateurs issues 
+          des API Gmail pour entraîner, développer ou améliorer des modèles d'intelligence artificielle ou d'apprentissage automatique généralisés.
+          Toutes les données sont traitées uniquement pour fournir les fonctionnalités attendues par l'utilisateur dans un environnement 
+          sécurisé et respectueux de la vie privée.
+        </p>
+        
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">5. Où et combien de temps sont stockées vos données ?</h2>
         <p>Vos données sont hébergées de façon sécurisée sur Firebase.</p>
         <p>Les messages sont temporairement stockés afin d'être visibles dans votre historique d'activité.</p>
         <p>Vous pouvez à tout moment supprimer votre compte et toutes vos données.</p>
         
-        <h2 className="text-2xl font-semibold text-gray-900 mt-8">5. Partage avec des tiers</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">6. Partage avec des tiers</h2>
         <p>Nous ne partageons jamais vos données avec des tiers.</p>
         
-        <h2 className="text-2xl font-semibold text-gray-900 mt-8">6. Sécurité</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">7. Sécurité</h2>
         <ul className="list-disc pl-6 space-y-2">
           <li>Les accès aux données sont protégés par chiffrement.</li>
           <li>L'accès est limité à votre compte OAuth.</li>
           <li>Nous suivons les meilleures pratiques de sécurité (authentification sécurisée, audit des accès, etc.).</li>
         </ul>
         
-        <h2 className="text-2xl font-semibold text-gray-900 mt-8">7. Vos droits</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">8. Vos droits</h2>
         <p>Vous pouvez :</p>
         <ul className="list-disc pl-6 space-y-2">
           <li>Révoquer les autorisations via votre compte Google</li>
@@ -72,7 +81,7 @@ const PrivacyPolicyPage: React.FC = () => {
     en: (
       <>
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Privacy Policy – EcomVA</h1>
-        <p className="text-gray-500 mb-8">Last updated: 05/02/2025</p>
+        <p className="text-gray-500 mb-8">Last updated: 05/05/2025</p>
         
         <h2 className="text-2xl font-semibold text-gray-900 mt-8">1. Who We Are</h2>
         <p>
@@ -99,22 +108,30 @@ const PrivacyPolicyPage: React.FC = () => {
           <li>Display history in your dashboard</li>
         </ul>
         
-        <h2 className="text-2xl font-semibold text-gray-900 mt-8">4. Where and How Long Your Data Is Stored</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">4. Gmail Data Usage</h2>
+        <p>
+          EcomVA uses Gmail APIs to automate customer email management (reading, labeling, responding, drafting).
+          We do not permanently store email contents and we do not use any user data from Gmail APIs to train, develop, 
+          or improve generalized artificial intelligence or machine learning models.
+          All data is processed solely to provide the features expected by the user in a secure and privacy-respecting environment.
+        </p>
+        
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">5. Where and How Long Your Data Is Stored</h2>
         <p>Your data is securely hosted on Firebase.</p>
         <p>Messages are temporarily stored to be visible in your activity history.</p>
         <p>You can delete your account and all your data at any time.</p>
         
-        <h2 className="text-2xl font-semibold text-gray-900 mt-8">5. Third-Party Sharing</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">6. Third-Party Sharing</h2>
         <p>We never share your data with third parties.</p>
         
-        <h2 className="text-2xl font-semibold text-gray-900 mt-8">6. Security</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">7. Security</h2>
         <ul className="list-disc pl-6 space-y-2">
           <li>Data access is protected by encryption.</li>
           <li>Access is limited to your OAuth account.</li>
           <li>We follow security best practices (secure authentication, access auditing, etc.).</li>
         </ul>
         
-        <h2 className="text-2xl font-semibold text-gray-900 mt-8">7. Your Rights</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mt-8">8. Your Rights</h2>
         <p>You can:</p>
         <ul className="list-disc pl-6 space-y-2">
           <li>Revoke authorizations through your Google account</li>
