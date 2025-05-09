@@ -27,6 +27,16 @@
         "validation": "Erreur de validation"
       }
     },
+    "email": {
+      "autoSend": {
+        "title": "Envoi automatique",
+        "draftScheduled": "Brouillon programmé pour envoi automatique",
+        "draftSent": "Brouillon envoyé automatiquement",
+        "responseScheduled": "Réponse programmée pour envoi automatique",
+        "responseSent": "Réponse envoyée automatiquement",
+        "scheduledFor": "Programmé pour {{time}}"
+      }
+    },
     "navigation": {
       "dashboard": "Tableau de bord",
       "integrations": "Intégrations",
@@ -443,7 +453,11 @@
         "drafted": "Brouillon",
         "sent": "Envoyé",
         "failed": "Échoué",
-        "ignored": "Ignoré"
+        "ignored": "Ignoré",
+        "draft_created": "Brouillon créé",
+        "draft_sent": "Brouillon envoyé",
+        "draft_failed": "Échec d'envoi du brouillon",
+        "draft_scheduled": "Brouillon programmé"
       },
       "pagination": {
         "previous": "Précédent",

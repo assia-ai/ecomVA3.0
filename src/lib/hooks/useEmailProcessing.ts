@@ -4,6 +4,7 @@ import { classifyEmail, saveEmailActivity, generateDraftContent } from '../servi
 import { GmailService, GmailAuthError, GmailNetworkError, GMAIL_AUTH_ERROR_EVENT_NAME } from '../services/gmail';
 import { OutlookService } from '../services/outlook';
 import { getUserIntegrations } from '../services/integrations';
+import { AutoSenderService } from '../services/autoSender';
 import toast from 'react-hot-toast';
 import { getStoredUserSession } from '../services/auth-persistence';
 import i18next from 'i18next';
@@ -142,7 +143,8 @@ export function useEmailProcessing() {
           autoDraft: true,
           signature: '',
           responseTone: 'professional',
-          responseLength: 'balanced'
+          responseLength: 'balanced',
+          autoSendDelay: 0
         };
 
         // Check if we should create a draft
@@ -191,6 +193,26 @@ export function useEmailProcessing() {
                 );
                 console.log(`processEmail: Gmail draft created with ID ${draftId}`);
                 draftUrl = `https://mail.google.com/mail/u/0/#drafts/${draftId}`;
+                
+                // Après avoir créé le brouillon, on utilise AutoSenderService pour gérer l'envoi automatique
+                const autoSender = new AutoSenderService(userId, gmail);
+                
+                // On planifie l'envoi automatique du brouillon si les préférences le permettent
+                if (activityId && draftId) {
+                  const scheduledTime = await autoSender.scheduleDraftSend(draftId, activityId);
+                  if (scheduledTime) {
+                    console.log(`processEmail: Draft scheduled to be sent at ${scheduledTime.toISOString()}`);
+                    
+                    // Si le délai est de 0, le brouillon a déjà été envoyé par scheduleDraftSend
+                    if (preferences.autoSendDelay === 0) {
+                      toast.success(i18next.t('notifications.draftSentImmediately'));
+                    } else {
+                      toast.success(i18next.t('notifications.draftScheduled', { 
+                        minutes: preferences.autoSendDelay 
+                      }));
+                    }
+                  }
+                }
               } catch (gmailError) {
                 console.error("processEmail: Error creating Gmail draft:", gmailError);
                 if (gmailError instanceof GmailNetworkError) {
@@ -248,6 +270,17 @@ export function useEmailProcessing() {
           if (draftUrl) {
             console.log(`processEmail: Updating activity with draft URL ${draftUrl}`);
             try {
+              // Extraire l'ID du brouillon depuis l'URL
+              let extractedDraftId: string | undefined = undefined;
+              
+              if (draftUrl.includes('/drafts/')) {
+                extractedDraftId = draftUrl.split('/drafts/').pop();
+              } else if (draftUrl.includes('compose=')) {
+                extractedDraftId = draftUrl.split('compose=').pop();
+              }
+              
+              console.log(`processEmail: Extracted draft ID from URL: ${extractedDraftId}`);
+              
               await saveEmailActivity(
                 userId,
                 subject,
@@ -256,7 +289,9 @@ export function useEmailProcessing() {
                 'draft_created',
                 draftUrl,
                 body,
-                messageId
+                messageId,
+                undefined,  // threadId
+                draftId || extractedDraftId  // Utiliser l'ID du brouillon
               );
             } catch (updateError) {
               console.error("processEmail: Error updating activity with draft URL:", updateError);
