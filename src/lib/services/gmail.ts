@@ -883,8 +883,15 @@ export class GmailService {
     // Store the user ID for potential token updates
     this.userId = userId;
     
+    // Correction: S'assurer que autoDraft est défini, par défaut à true si non spécifié
+    const preferences = {
+      ...userPreferences,
+      autoDraft: userPreferences?.autoDraft !== false // force true par défaut sauf si explicitement false
+    };
+    
     try {
       console.log(`processRecentEmails: Starting to process recent emails for user ${userId}`);
+      console.log(`processRecentEmails: Auto-draft status: ${preferences.autoDraft ? 'ENABLED' : 'DISABLED'}`);
       
       // Load all labels first
       await this.loadLabels();
@@ -1000,7 +1007,7 @@ export class GmailService {
           );
 
           // Check if we should create a draft response
-          if (category !== `🚫 ${i18next.t('preferences.categories.spam')}` && userPreferences?.autoDraft !== false && activityId !== null) {
+          if (category !== `🚫 ${i18next.t('preferences.categories.spam')}` && preferences.autoDraft && activityId !== null) {
             try {
               // Check if we already have a draft for this message
               if (createdDrafts.has(message.id)) {
@@ -1012,7 +1019,7 @@ export class GmailService {
               console.log(`processRecentEmails: Creating draft for message ${message.id} with category ${category}`);
               
               // Get user's signature from preferences
-              const signature = userPreferences?.signature || '';
+              const signature = preferences?.signature || '';
               console.log(`processRecentEmails: User signature ${signature ? 'exists' : 'does not exist'}`);
               
               // Generate the response using the webhook, passing the signature
@@ -1023,9 +1030,9 @@ export class GmailService {
                 category, 
                 from,
                 signature,
-                userPreferences?.fromEmail,
-                userPreferences?.shopDomain,
-                userPreferences?.shopifyAccessToken
+                preferences?.fromEmail,
+                preferences?.shopDomain,
+                preferences?.shopifyAccessToken
               );
               
               // Create the draft
@@ -1044,10 +1051,10 @@ export class GmailService {
               // Gmail draft URL format: https://mail.google.com/mail/u/0/#drafts?compose=draftId
               // Using the correct format ensures direct opening of the specific draft
               const draftUrl = `https://mail.google.com/mail/u/0/#drafts?compose=${draftId}`;
-              console.log(`processRecentEmails: Created draft with URL ${draftUrl}`);
+              console.log(`processRecentEmails: Created draft with URL ${draftUrl} and ID ${draftId}`);
               
-              // Update the activity with the draft URL
-              await saveEmailActivity(
+              // Update the activity with the draft URL AND the draft ID
+              const updatedActivityId = await saveEmailActivity(
                 userId,
                 subject,
                 from,
@@ -1056,10 +1063,37 @@ export class GmailService {
                 draftUrl,
                 message.snippet || '',
                 message.id,
-                message.threadId  // Pass the threadId here
+                message.threadId,  // Pass the threadId here
+                draftId            // Pass the draftId here - This is crucial for auto-send
               );
               
-              console.log(`processRecentEmails: Updated activity for message ${message.id} with draft URL`);
+              console.log(`processRecentEmails: Updated activity for message ${message.id} with draft URL and ID`);
+              
+              // Si les préférences incluent l'envoi automatique, planifier l'envoi
+              if (preferences.autoSendDrafts && draftId && activityId) {
+                try {
+                  // Importation dynamique pour éviter les dépendances circulaires
+                  const { AutoSenderService } = await import('./autoSender');
+                  
+                  // Création du service d'envoi automatique
+                  const autoSender = new AutoSenderService(userId, this);
+                  
+                  // Planification de l'envoi
+                  console.log(`processRecentEmails: Scheduling auto-send for draft ${draftId} of email ${message.id}`);
+                  const scheduledTime = await autoSender.scheduleDraftSend(draftId, activityId);
+                  
+                  if (scheduledTime) {
+                    console.log(`processRecentEmails: Draft ${draftId} scheduled for sending at ${scheduledTime.toISOString()}`);
+                  } else {
+                    console.log(`processRecentEmails: Draft ${draftId} was not scheduled for sending (auto-send disabled or error)`);
+                  }
+                } catch (autoSendError) {
+                  console.error(`processRecentEmails: Failed to schedule auto-send for draft ${draftId}:`, autoSendError);
+                  // Continue processing even if scheduling fails
+                }
+              } else {
+                console.log(`processRecentEmails: Auto-send not enabled for user ${userId}, skipping schedule`);
+              }
             } catch (draftError) {
               console.error(`Failed to create draft for message ${message.id}:`, draftError);
               // Continue processing even if draft creation fails
@@ -1067,7 +1101,7 @@ export class GmailService {
           } else {
             if (category === `🚫 ${i18next.t('preferences.categories.spam')}`) {
               console.log(`processRecentEmails: Skipping draft creation for message ${message.id} (spam)`);
-            } else if (userPreferences?.autoDraft === false) {
+            } else if (!preferences.autoDraft) {
               console.log(`processRecentEmails: Skipping draft creation for message ${message.id} (autoDraft disabled)`);
             } else if (activityId === null) {
               console.log(`processRecentEmails: Skipping draft creation for message ${message.id} (already processed)`);
@@ -1405,17 +1439,38 @@ export class GmailService {
         requestBody.message.threadId = threadId;
       }
       
-      const response = await this.request<{ id: string }>('/drafts', {
+      const response = await this.request<any>('/drafts', {
         method: 'POST',
         body: JSON.stringify(requestBody)
       });
 
       console.log(`createDraft: Draft created successfully with ID ${response.id}`);
       
-      // Store the draft key to prevent duplicates
-      createdDrafts.set(draftKey, response.id);
+      // IMPORTANT: Cette partie est cruciale pour obtenir le bon ID de brouillon Gmail
+      // L'API Gmail renvoie deux ID: response.id (ID du brouillon) et response.message.id (ID du message)
+      // L'interface Gmail utilise l'ID du message pour les URL de brouillon
       
-      return response.id;
+      if (!response.message || !response.message.id) {
+        console.warn('createDraft: Could not retrieve Gmail UI-compatible ID, falling back to API draft ID');
+        
+        // Store the draft key to prevent duplicates
+        createdDrafts.set(draftKey, response.id);
+        return response.id;
+      }
+      
+      // Générer un ID compatible avec l'interface utilisateur Gmail
+      // Format correct pour l'URL d'un brouillon Gmail: "https://mail.google.com/mail/u/0/#drafts?compose=<MESSAGE_ID>"
+      const gmailUICompatibleId = response.message.id;
+      console.log(`createDraft: Retrieved Gmail UI-compatible ID: ${gmailUICompatibleId}`);
+      
+      // Store the draft key to prevent duplicates with the UI-compatible ID
+      createdDrafts.set(draftKey, gmailUICompatibleId);
+      
+      // Stocker également la relation entre l'ID du brouillon API et l'ID utilisateur Gmail
+      console.log(`createDraft: Mapping API draft ID ${response.id} to UI ID ${gmailUICompatibleId}`);
+      
+      // IMPORTANT: Retourner l'ID compatible avec l'interface Gmail, pas l'ID de l'API
+      return gmailUICompatibleId;
     } catch (error) {
       console.error(`createDraft: Failed to create draft:`, error);
       throw error;
@@ -1495,6 +1550,211 @@ export class GmailService {
     } catch (error) {
       console.error('Failed to disconnect Gmail:', error);
       throw new Error('Failed to disconnect Gmail account');
+    }
+  }
+
+  // Send a draft by its ID
+  async sendDraft(draftId: string): Promise<{ id: string, threadId: string }> {
+    try {
+      if (!draftId || typeof draftId !== 'string') {
+        throw new Error('Invalid draft ID provided');
+      }
+      
+      console.log(`sendDraft: Original draft ID: ${draftId}`);
+      
+      // Normaliser l'ID si c'est une URL
+      let messageOrDraftId = draftId;
+      
+      if (draftId.includes('mail.google.com')) {
+        try {
+          if (draftId.includes('/drafts/')) {
+            messageOrDraftId = draftId.split('/drafts/').pop() || draftId;
+          } else if (draftId.includes('compose=')) {
+            messageOrDraftId = draftId.split('compose=').pop() || draftId;
+          }
+          console.log(`sendDraft: Extracted ID from URL: ${messageOrDraftId}`);
+        } catch (parseError) {
+          console.warn(`sendDraft: Error parsing draft URL: ${parseError}`);
+        }
+      }
+
+      // Première solution: Utiliser notre utilitaire spécial de contournement CORS
+      try {
+        // Importer dynamiquement l'utilitaire de contournement CORS
+        const { sendDraftWithCorsWorkaround, getDraftsWithCorsWorkaround } = await import('../corsUtils');
+        
+        console.log(`sendDraft: Using CORS workaround to send draft ${messageOrDraftId}`);
+        
+        try {
+          // Essayer d'abord de récupérer la liste des brouillons pour trouver l'ID correct
+          // Cette opération sera simulée en développement local
+          const drafts = await getDraftsWithCorsWorkaround(this.accessToken);
+          console.log(`sendDraft: Retrieved ${drafts.length} drafts`);
+          
+          // Rechercher le brouillon qui correspond à notre ID
+          const matchingDraft = drafts.find(draft => 
+            draft.id === messageOrDraftId || draft.message.id === messageOrDraftId
+          );
+          
+          // Si on trouve une correspondance, utiliser cet ID
+          if (matchingDraft) {
+            console.log(`sendDraft: Found matching draft with ID ${matchingDraft.id}`);
+            messageOrDraftId = matchingDraft.id;
+          }
+          
+          // Envoyer le brouillon avec notre utilitaire de contournement CORS
+          const response = await sendDraftWithCorsWorkaround(messageOrDraftId, this.accessToken);
+          
+          console.log(`sendDraft: Draft sent successfully with CORS workaround, ID: ${response.id}`);
+          return response;
+        } catch (corsWorkaroundError) {
+          console.error(`sendDraft: CORS workaround failed:`, corsWorkaroundError);
+          // Continuer avec les autres approches en cas d'échec
+          throw corsWorkaroundError;
+        }
+      } catch (importError) {
+        console.error(`sendDraft: Failed to import CORS utils:`, importError);
+        // Continuer avec les approches alternatives si l'import échoue
+      }
+
+      // Deuxième solution: Essayer d'utiliser l'API GAPI
+      try {
+        // Importation dynamique pour éviter les problèmes de dépendances circulaires
+        const { executeGmailApiRequest, initializeGoogleApi } = await import('../googleApiClient');
+        
+        // S'assurer que l'API Google est initialisée avec le token actuel
+        await initializeGoogleApi(this.accessToken);
+        
+        console.log(`sendDraft: Using GAPI to send draft with ID: ${messageOrDraftId}`);
+        
+        try {
+          // Essai direct avec l'ID trouvé
+          const response = await executeGmailApiRequest<{ id: string, threadId: string, labelIds: string[] }>(
+            `drafts/${messageOrDraftId}/send`,
+            'POST',
+            {},
+            {}
+          );
+          
+          console.log(`sendDraft: Draft sent successfully via GAPI, message ID: ${response.id}, thread ID: ${response.threadId || 'N/A'}`);
+          return {
+            id: response.id,
+            threadId: response.threadId || response.id
+          };
+        } catch (directSendError: any) {
+          // Afficher tous les détails de l'erreur pour le débogage
+          console.error(`sendDraft: Error sending draft via GAPI:`, directSendError);
+          
+          // Si l'API GAPI échoue, essayer la méthode fetch traditionnelle comme dernier recours
+          console.log(`sendDraft: Falling back to traditional fetch method`);
+          return await this._sendDraftWithFetch(messageOrDraftId);
+        }
+      } catch (gapiError) {
+        console.error(`sendDraft: Error initializing GAPI:`, gapiError);
+        
+        // Si GAPI échoue complètement, utiliser la méthode fetch
+        console.log(`sendDraft: Unable to use GAPI, using traditional fetch as fallback`);
+        return await this._sendDraftWithFetch(messageOrDraftId);
+      }
+    } catch (error: any) {
+      // Amélioration de l'affichage des erreurs pour le débogage
+      let errorDetails = 'Unknown error';
+      
+      try {
+        if (typeof error === 'object') {
+          errorDetails = JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
+        } else {
+          errorDetails = String(error);
+        }
+      } catch (e) {
+        errorDetails = `${error}`;
+      }
+      
+      console.error(`Failed to send draft ${draftId}:`, errorDetails);
+      throw new Error(`Failed to send draft: ${error.message || errorDetails}`);
+    }
+  }
+  
+  // Méthode originale de sendDraft utilisant fetch
+  private async _sendDraftWithFetch(draftId: string): Promise<{ id: string, threadId: string }> {
+    try {
+      console.log(`_sendDraftWithFetch: Sending draft ${draftId} using fetch`);
+      
+      // Essayer d'envoyer directement avec l'ID fourni
+      try {
+        const response = await this.request<{ id: string, threadId: string, labelIds: string[] }>(
+          `/drafts/${draftId}/send`,
+          {
+            method: 'POST',
+            body: JSON.stringify({})
+          }
+        );
+        
+        console.log(`_sendDraftWithFetch: Draft sent successfully, message ID: ${response.id}, thread ID: ${response.threadId}`);
+        return {
+          id: response.id,
+          threadId: response.threadId
+        };
+      } catch (directError: any) {
+        // Si l'envoi direct échoue, essayer de récupérer les brouillons
+        if (directError.status === 404 || (directError.message && directError.message.includes('404'))) {
+          console.log(`_sendDraftWithFetch: Draft not found with ID ${draftId}, trying to list all drafts`);
+          
+          const draftsResponse = await this.request<{ drafts: Array<{ id: string, message: { id: string, threadId?: string } }> }>('/drafts');
+          
+          if (!draftsResponse.drafts || draftsResponse.drafts.length === 0) {
+            throw new Error('No drafts found in Gmail account');
+          }
+          
+          // Afficher tous les brouillons disponibles pour le débogage
+          console.log(`_sendDraftWithFetch: Found ${draftsResponse.drafts.length} drafts, searching for a match...`);
+          console.log(`Available draft IDs: ${draftsResponse.drafts.map(d => d.id).join(', ')}`);
+          
+          // Essayer de trouver le brouillon avec une correspondance partielle
+          // en cas d'ID incomplet ou de format différent
+          const targetDraft = draftsResponse.drafts.find(draft => 
+            draft.id === draftId || 
+            draft.message?.id === draftId ||
+            draft.id.includes(draftId) ||
+            (draftId.includes(draft.id))
+          );
+          
+          if (!targetDraft) {
+            throw new Error(`Could not find any draft matching ID ${draftId} in your Gmail account`);
+          }
+          
+          console.log(`_sendDraftWithFetch: Found matching draft with ID ${targetDraft.id}`);
+          
+          // Envoyer le brouillon avec l'ID correct
+          const response = await this.request<{ id: string, threadId: string, labelIds: string[] }>(
+            `/drafts/${targetDraft.id}/send`,
+            {
+              method: 'POST',
+              body: JSON.stringify({})
+            }
+          );
+          
+          console.log(`_sendDraftWithFetch: Draft sent successfully with corrected ID`);
+          return {
+            id: response.id,
+            threadId: response.threadId
+          };
+        } else {
+          // Si ce n'est pas une erreur 404, propager l'erreur
+          throw directError;
+        }
+      }
+    } catch (error: any) {
+      // Afficher tous les détails de l'erreur
+      let errorDetails = 'Unknown error';
+      try {
+        errorDetails = JSON.stringify(error, null, 2);
+      } catch (e) {
+        errorDetails = String(error);
+      }
+      
+      console.error(`_sendDraftWithFetch: Failed to send draft ${draftId}:`, errorDetails);
+      throw error;
     }
   }
 }

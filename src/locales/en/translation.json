@@ -27,6 +27,16 @@
         "validation": "Validation error"
       }
     },
+    "email": {
+      "autoSend": {
+        "title": "Auto Send",
+        "draftScheduled": "Draft scheduled for auto-sending",
+        "draftSent": "Draft automatically sent",
+        "responseScheduled": "Response scheduled for auto-sending",
+        "responseSent": "Response automatically sent",
+        "scheduledFor": "Scheduled for {{time}}"
+      }
+    },
     "auth": {
       "title": "Authentication",
       "login": "Login",

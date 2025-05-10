@@ -457,7 +457,8 @@ export async function saveEmailActivity(
   draftUrl?: string,
   body?: string,
   messageId?: string,
-  threadId?: string  // Add threadId parameter
+  threadId?: string,  // Add threadId parameter
+  draftId?: string    // Add draftId parameter
 ): Promise<string | null> {
   try {
     console.log(`saveEmailActivity: Saving email activity with status "${status}" and category "${category}"`);
@@ -497,9 +498,10 @@ export async function saveEmailActivity(
           await updateDoc(docRef, {
             status: 'draft_created',
             draftUrl,
+            draftId: draftId || null,  // Ajouter l'ID du brouillon lors de la mise à jour
             draftCreatedAt: new Date()
           });
-          console.log(`saveEmailActivity: Successfully updated document ${existingDocId} with draft URL`);
+          console.log(`saveEmailActivity: Successfully updated document ${existingDocId} with draft URL and ID ${draftId || 'non défini'}`);
           
           // Return the existing document ID to indicate it was updated
           return existingDocId;
@@ -551,6 +553,7 @@ export async function saveEmailActivity(
             await updateDoc(docRef, {
               status: 'draft_created',
               draftUrl,
+              draftId: draftId || null,  // Ajouter l'ID du brouillon lors de la mise à jour
               draftCreatedAt: new Date()
             });
             console.log(`saveEmailActivity: Successfully updated document with draft URL`);
@@ -605,6 +608,7 @@ export async function saveEmailActivity(
       body: body || null,
       messageId: messageId || null,
       threadId: threadId || null,  // Add threadId to the document
+      draftId: draftId || null,    // Add draftId to the document
       draftCreatedAt: status === 'draft_created' ? new Date() : null
     };
     

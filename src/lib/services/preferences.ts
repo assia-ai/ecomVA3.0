@@ -4,16 +4,18 @@ import type { UserProfile } from '../collections';
 
 export async function saveUserPreferences(
   userId: string,
-  preferences: UserProfile['preferences']
+  userProfile: Partial<UserProfile>
 ): Promise<UserProfile> {
   try {
-    console.log('Saving user preferences:', preferences);
+    console.log('Saving user preferences:', userProfile);
     const userRef = doc(db, 'users', userId);
     
-    await updateDoc(userRef, {
-      preferences,
+    const updateData: Partial<UserProfile> & { updatedAt: string } = {
+      ...userProfile,
       updatedAt: new Date().toISOString()
-    });
+    };
+    
+    await updateDoc(userRef, updateData);
     
     // After saving, fetch the updated user profile to return
     const docSnap = await getDoc(userRef);

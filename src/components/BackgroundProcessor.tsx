@@ -6,9 +6,10 @@ import { db } from '../lib/firebase';
 import { classifyEmail, saveEmailActivity, generateDraftContent } from '../lib/services/email';
 import { IntegrationPermissionError } from '../lib/services/integrations';
 import { refreshIntegration } from '../lib/services/integrations';
+import { AutoSenderService } from '../lib/services/autoSender';
 
 // Time in milliseconds between background processing runs
-const PROCESSING_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const PROCESSING_INTERVAL = 1 * 60 * 1000; // 1 minute (anciennement 5 minutes)
 
 // Maximum number of failed Gmail auth attempts before backing off
 const MAX_AUTH_FAILURES = 3;
@@ -93,6 +94,22 @@ const BackgroundProcessor: React.FC = () => {
         
         // Process emails
         await gmail.processRecentEmails(session.userId, userPrefs);
+        
+        // Traiter les brouillons en attente d'envoi automatique
+        try {
+          console.log('[BackgroundProcessor] Appel de processPendingDrafts (début)');
+          const autoSender = new AutoSenderService(session.userId, gmail);
+          const sentDrafts = await autoSender.processPendingDrafts();
+          
+          if (sentDrafts > 0) {
+            console.log(`BackgroundProcessor: Sent ${sentDrafts} pending drafts automatically`);
+          } else {
+            console.log('BackgroundProcessor: No pending drafts ready for sending');
+          }
+        } catch (draftError) {
+          console.error('BackgroundProcessor: Error processing pending drafts:', draftError);
+          // Continue with other processing even if draft sending fails
+        }
         
         // Update last run time
         setLastRun(new Date());
@@ -243,7 +260,10 @@ function getDefaultPreferences() {
     signature: '',
     hiddenCategories: [],
     responseTone: 'professional',
-    responseLength: 'balanced'
+    responseLength: 'balanced',
+    autoSendDrafts: false,       // Ajout de l'option autoSendDrafts
+    autoSendResponses: false,    // Ajout de l'option autoSendResponses
+    autoSendDelay: 5             // Ajout de l'option autoSendDelay avec valeur par défaut de 5 minutes
   };
 }
 

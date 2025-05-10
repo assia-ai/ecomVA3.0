@@ -5,7 +5,8 @@ import {
   Save, 
   CheckSquare, 
   Square,
-  MessageSquare 
+  MessageSquare,
+  Clock
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -23,6 +24,11 @@ const PreferencesPage: React.FC = () => {
   const [autoClassify, setAutoClassify] = useState(userProfile?.preferences?.autoClassify || true);
   const [autoDraft, setAutoDraft] = useState(userProfile?.preferences?.autoDraft || true);
   const [signature, setSignature] = useState(userProfile?.preferences?.signature || '');
+  
+  // State for auto-send preferences
+  const [autoSendDrafts, setAutoSendDrafts] = useState(userProfile?.preferences?.autoSendDrafts || false);
+  const [autoSendResponses, setAutoSendResponses] = useState(userProfile?.preferences?.autoSendResponses || false);
+  const [autoSendDelay, setAutoSendDelay] = useState(userProfile?.preferences?.autoSendDelay || 5);
   
   // State for hidden categories
   const [hiddenCategories, setHiddenCategories] = useState<string[]>(
@@ -65,10 +71,17 @@ const PreferencesPage: React.FC = () => {
         signature,
         hiddenCategories,
         responseTone: userProfile?.preferences?.responseTone || 'professional',
-        responseLength: userProfile?.preferences?.responseLength || 'balanced'
+        responseLength: userProfile?.preferences?.responseLength || 'balanced',
+        autoSendDrafts,
+        autoSendResponses,
+        autoSendDelay
       };
       
-      await saveUserPreferences(currentUser.uid, updatedPreferences);
+      const userProfileUpdate = {
+        preferences: updatedPreferences
+      };
+      
+      await saveUserPreferences(currentUser.uid, userProfileUpdate);
       await refreshUserProfile(currentUser.uid);
       
       toast.success(t('preferences.saveSuccess', 'Preferences saved successfully'));
@@ -137,6 +150,64 @@ const PreferencesPage: React.FC = () => {
                 )}
               </button>
             </div>
+            
+            {/* Auto-send preferences */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-medium">{t('email.autoSend.title')}</h4>
+                <p className="text-xs text-gray-500">{t('email.autoSend.draftScheduled')}</p>
+              </div>
+              <button
+                onClick={() => setAutoSendDrafts(!autoSendDrafts)}
+                className="focus:outline-none"
+                aria-label={autoSendDrafts ? "Disable auto-send drafts" : "Enable auto-send drafts"}
+              >
+                {autoSendDrafts ? (
+                  <CheckSquare className="h-6 w-6 text-primary-600" />
+                ) : (
+                  <Square className="h-6 w-6 text-gray-400" />
+                )}
+              </button>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-medium">{t('email.autoSend.responseScheduled')}</h4>
+                <p className="text-xs text-gray-500">{t('email.autoSend.responseSent')}</p>
+              </div>
+              <button
+                onClick={() => setAutoSendResponses(!autoSendResponses)}
+                className="focus:outline-none"
+                aria-label={autoSendResponses ? "Disable auto-send responses" : "Enable auto-send responses"}
+              >
+                {autoSendResponses ? (
+                  <CheckSquare className="h-6 w-6 text-primary-600" />
+                ) : (
+                  <Square className="h-6 w-6 text-gray-400" />
+                )}
+              </button>
+            </div>
+            
+            {/* Auto-send delay */}
+            {(autoSendDrafts || autoSendResponses) && (
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-1 text-primary-600" />
+                  <label className="text-sm font-medium">Délai d'envoi automatique (minutes)</label>
+                </div>
+                <Input 
+                  type="number" 
+                  min="1"
+                  max="60"
+                  value={autoSendDelay}
+                  onChange={(e) => setAutoSendDelay(parseInt(e.target.value) || 5)}
+                  className="w-full max-w-xs"
+                />
+                <p className="text-xs text-gray-500">
+                  {t('email.autoSend.scheduledFor', { time: `${autoSendDelay} minutes` })}
+                </p>
+              </div>
+            )}
             
             <div className="space-y-2">
               <label className="text-sm font-medium">{t('preferences.signature.title')}</label>
